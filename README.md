@@ -11,6 +11,8 @@ A comprehensive web-based calculator platform featuring 20+ specialized calculat
 </div>
 
 ---
+<img width="1322" height="634" alt="image" src="https://github.com/user-attachments/assets/6c9cdcac-dac3-4043-8010-96db22d8df18" />
+
 
 ## 📋 Overview
 
