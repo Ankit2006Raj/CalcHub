@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Grade Calculator - CalcHub{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>Grade Calculator</h1>
+    <div class="calc-container">
+        <div class="input-group">
+            <label>Marks Scored</label>
+            <input type="number" id="scored" placeholder="Enter marks scored">
+        </div>
+        <div class="input-group">
+            <label>Total Marks</label>
+            <input type="number" id="total" placeholder="Enter total marks">
+        </div>
+        <button class="btn-primary" onclick="calculateGrade()">Calculate Grade</button>
+
+        <div id="result" class="result-box" style="display:none;">
+            <h2>Your Grade: <span id="gradeValue"></span></h2>
+            <div class="percentage-bar">
+                <div id="percentageIndicator" class="percentage-fill"></div>
+            </div>
+            <p class="percentage-text">Percentage: <span id="percentage"></span>%</p>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/pdf-utils.js') }}"></script>
+<script>
+    let currentData = null;
+
+    async function calculateGrade() {
+        const scored = document.getElementById('scored').value;
+        const total = document.getElementById('total').value;
+
+        if (!scored || !total) {
+            alert('Please fill all fields');
+            return;
+        }
+
+        currentData = { scored, total };
+
+        const response = await fetch('/api/grade', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(currentData)
+        });
+
+        const data = await response.json();
+
+        document.getElementById('gradeValue').textContent = data.grade;
+        document.getElementById('gradeValue').style.color = data.color;
+        document.getElementById('percentage').textContent = data.percentage;
+        document.getElementById('percentageIndicator').style.width = data.percentage + '%';
+        document.getElementById('percentageIndicator').style.backgroundColor = data.color;
+        document.getElementById('result').style.display = 'block';
+
+        addPDFDownloadButton('result', '/api/pdf/grade', () => currentData, 'Grade');
+    }
+</script>
+{% endblock %}

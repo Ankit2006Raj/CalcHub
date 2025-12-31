@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}BMR Calculator - CalcHub{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>BMR Calculator</h1>
+    <div class="calc-container">
+        <div class="input-group">
+            <label>Gender</label>
+            <select id="gender">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Age (years)</label>
+            <input type="number" id="age" placeholder="Enter age">
+        </div>
+        <div class="input-group">
+            <label>Height (cm)</label>
+            <input type="number" id="height" placeholder="Enter height">
+        </div>
+        <div class="input-group">
+            <label>Weight (kg)</label>
+            <input type="number" id="weight" placeholder="Enter weight">
+        </div>
+        <button class="btn-primary" onclick="calculateBMR()">Calculate BMR</button>
+
+        <div id="result" class="result-box" style="display:none;">
+            <h2>Your BMR: <span id="bmrValue"></span> calories/day</h2>
+            <h3>Daily Calorie Needs by Activity Level:</h3>
+            <div class="bmr-results">
+                <p>Sedentary: <span id="sedentary"></span></p>
+                <p>Light Exercise: <span id="light"></span></p>
+                <p>Moderate Exercise: <span id="moderate"></span></p>
+                <p>Active: <span id="active"></span></p>
+                <p>Very Active: <span id="very_active"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/pdf-utils.js') }}"></script>
+<script>
+    let currentData = null;
+
+    async function calculateBMR() {
+        const gender = document.getElementById('gender').value;
+        const age = document.getElementById('age').value;
+        const height = document.getElementById('height').value;
+        const weight = document.getElementById('weight').value;
+
+        if (!age || !height || !weight) {
+            alert('Please fill all fields');
+            return;
+        }
+
+        currentData = { gender, age, height, weight };
+
+        const response = await fetch('/api/bmr', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(currentData)
+        });
+
+        const data = await response.json();
+
+        document.getElementById('bmrValue').textContent = data.bmr;
+        document.getElementById('sedentary').textContent = data.sedentary + ' cal/day';
+        document.getElementById('light').textContent = data.light + ' cal/day';
+        document.getElementById('moderate').textContent = data.moderate + ' cal/day';
+        document.getElementById('active').textContent = data.active + ' cal/day';
+        document.getElementById('very_active').textContent = data.very_active + ' cal/day';
+        document.getElementById('result').style.display = 'block';
+
+        addPDFDownloadButton('result', '/api/pdf/bmr', () => currentData, 'BMR');
+    }
+</script>
+{% endblock %}

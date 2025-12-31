@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="hero">
+    <h1>All-in-One Smart Calculators</h1>
+    <p>Fast, Accurate & Always Free ✨</p>
+    <div class="search-container">
+        <input type="text" id="searchBar" placeholder="Search calculators... (or press Ctrl+K)"
+            onkeyup="searchCalculators()">
+    </div>
+    <div class="hero-badges">
+        <span class="hero-badge">🚀 20+ Calculators</span>
+        <span class="hero-badge">⚡ Lightning Fast</span>
+        <span class="hero-badge">📱 Mobile Friendly</span>
+    </div>
+</div>
+
+<div class="calculator-grid">
+    <div class="calc-card gradient-1" data-name="bmi calculator">
+        <h3>BMI Calculator</h3>
+        <p>Calculate your Body Mass Index</p>
+        <a href="/bmi" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-2" data-name="bmr calculator">
+        <h3>BMR Calculator</h3>
+        <p>Calculate Basal Metabolic Rate</p>
+        <a href="/bmr" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-3" data-name="loan calculator emi">
+        <h3>Loan EMI Calculator</h3>
+        <p>Calculate monthly loan payments</p>
+        <a href="/loan" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-4" data-name="age calculator">
+        <h3>Age Calculator</h3>
+        <p>Calculate your exact age</p>
+        <a href="/age" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-5" data-name="gpa calculator">
+        <h3>GPA Calculator</h3>
+        <p>Calculate your Grade Point Average</p>
+        <a href="/gpa" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-6" data-name="grade calculator">
+        <h3>Grade Calculator</h3>
+        <p>Calculate grades from marks</p>
+        <a href="/grade" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-7" data-name="calorie calculator">
+        <h3>Calorie Calculator</h3>
+        <p>Calculate daily calorie needs</p>
+        <a href="/calorie" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-8" data-name="pregnancy due date">
+        <h3>Pregnancy Due Date</h3>
+        <p>Calculate your due date</p>
+        <a href="/pregnancy" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-9" data-name="percentage calculator">
+        <h3>Percentage Calculator</h3>
+        <p>Calculate marks percentage</p>
+        <a href="/percentage" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-10" data-name="attendance calculator">
+        <h3>Attendance Calculator</h3>
+        <p>Track your attendance</p>
+        <a href="/attendance" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-11" data-name="compound interest">
+        <h3>Compound Interest</h3>
+        <p>Calculate compound interest</p>
+        <a href="/compound-interest" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-12" data-name="math calculator scientific">
+        <h3>Math Calculator</h3>
+        <p>Scientific calculator</p>
+        <a href="/math" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-1" data-name="mortgage calculator home loan">
+        <h3>Mortgage Calculator</h3>
+        <p>Calculate home loan payments</p>
+        <a href="/mortgage" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-2" data-name="discount calculator sale savings">
+        <h3>Discount Calculator</h3>
+        <p>Calculate discounts and savings</p>
+        <a href="/discount" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-3" data-name="calorie burn exercise fitness">
+        <h3>Calorie Burn Calculator</h3>
+        <p>Calculate calories burned during exercise</p>
+        <a href="/calorie-burn" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-4" data-name="water intake hydration">
+        <h3>Water Intake Calculator</h3>
+        <p>Calculate daily water needs</p>
+        <a href="/water-intake" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-5" data-name="currency converter exchange rate">
+        <h3>💱 Currency Converter</h3>
+        <p>Convert between currencies</p>
+        <a href="/currency-converter" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-6" data-name="unit converter measurement">
+        <h3>📏 Unit Converter</h3>
+        <p>Convert length, weight, temperature & more</p>
+        <a href="/unit-converter" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-7" data-name="macros calculator protein carbs fats">
+        <h3>🍎 Macros Calculator</h3>
+        <p>Calculate daily macronutrient needs</p>
+        <a href="/macros" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-8" data-name="sleep calculator bedtime wake time">
+        <h3>😴 Sleep Calculator</h3>
+        <p>Calculate optimal sleep times</p>
+        <a href="/sleep" class="btn">Open Calculator</a>
+    </div>
+</div>
+{% endblock %}

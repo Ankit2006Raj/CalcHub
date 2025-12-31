@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Unit Converter - CalcHub{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>📏 Unit Converter</h1>
+    <div class="calc-container">
+        <div class="input-group">
+            <label>Category</label>
+            <select id="category" onchange="updateUnits()">
+                <option value="length">Length</option>
+                <option value="weight">Weight</option>
+                <option value="temperature">Temperature</option>
+                <option value="volume">Volume</option>
+                <option value="area">Area</option>
+                <option value="speed">Speed</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Value</label>
+            <input type="number" id="value" placeholder="Enter value" value="1">
+        </div>
+        <div class="input-group">
+            <label>From Unit</label>
+            <select id="fromUnit"></select>
+        </div>
+        <div class="input-group">
+            <label>To Unit</label>
+            <select id="toUnit"></select>
+        </div>
+        <button class="btn-primary" onclick="convertUnit()">Convert</button>
+
+        <div id="result" class="result-box" style="display:none;">
+            <h2><span id="originalValue"></span> <span id="fromUnitText"></span> =</h2>
+            <h1 style="color: #667eea; font-size: 2.5em;"><span id="convertedValue"></span> <span
+                    id="toUnitText"></span></h1>
+            <div class="info-card">
+                <p><strong>Formula:</strong> <span id="formula"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const unitOptions = {
+        length: ['meter', 'kilometer', 'centimeter', 'millimeter', 'mile', 'yard', 'foot', 'inch'],
+        weight: ['kilogram', 'gram', 'milligram', 'metric_ton', 'pound', 'ounce', 'stone'],
+        temperature: ['celsius', 'fahrenheit', 'kelvin'],
+        volume: ['liter', 'milliliter', 'cubic_meter', 'gallon_us', 'gallon_uk', 'quart', 'pint', 'cup', 'fluid_ounce', 'tablespoon', 'teaspoon'],
+        area: ['square_meter', 'square_kilometer', 'square_centimeter', 'hectare', 'acre', 'square_mile', 'square_yard', 'square_foot', 'square_inch'],
+        speed: ['meter_per_second', 'kilometer_per_hour', 'mile_per_hour', 'foot_per_second', 'knot']
+    };
+
+    function updateUnits() {
+        const category = document.getElementById('category').value;
+        const units = unitOptions[category];
+
+        const fromUnit = document.getElementById('fromUnit');
+        const toUnit = document.getElementById('toUnit');
+
+        fromUnit.innerHTML = '';
+        toUnit.innerHTML = '';
+
+        units.forEach(unit => {
+            fromUnit.innerHTML += `<option value="${unit}">${unit.replace(/_/g, ' ')}</option>`;
+            toUnit.innerHTML += `<option value="${unit}">${unit.replace(/_/g, ' ')}</option>`;
+        });
+
+        if (units.length > 1) {
+            toUnit.selectedIndex = 1;
+        }
+    }
+
+    async function convertUnit() {
+        const value = document.getElementById('value').value;
+        const category = document.getElementById('category').value;
+        const fromUnit = document.getElementById('fromUnit').value;
+        const toUnit = document.getElementById('toUnit').value;
+
+        if (!value) {
+            alert('Please enter a value');
+            return;
+        }
+
+        const response = await fetch('/api/unit-converter', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ value, from_unit: fromUnit, to_unit: toUnit, category })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        document.getElementById('originalValue').textContent = data.original_value;
+        document.getElementById('fromUnitText').textContent = data.from_unit.replace(/_/g, ' ');
+        document.getElementById('convertedValue').textContent = data.converted_value;
+        document.getElementById('toUnitText').textContent = data.to_unit.replace(/_/g, ' ');
+        document.getElementById('formula').textContent = data.formula;
+        document.getElementById('result').style.display = 'block';
+    }
+
+    // Initialize units on page load
+    updateUnits();
+</script>
+{% endblock %}

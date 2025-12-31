@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Loan EMI Calculator - CalcHub{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>Loan EMI Calculator</h1>
+    <div class="calc-container">
+        <div class="input-group">
+            <label>Loan Amount ($)</label>
+            <input type="number" id="amount" placeholder="Enter loan amount">
+        </div>
+        <div class="input-group">
+            <label>Interest Rate (%)</label>
+            <input type="number" step="0.1" id="rate" placeholder="Enter interest rate">
+        </div>
+        <div class="input-group">
+            <label>Duration (years)</label>
+            <input type="number" id="duration" placeholder="Enter duration">
+        </div>
+        <button class="btn-primary" onclick="calculateLoan()">Calculate EMI</button>
+
+        <div id="result" class="result-box" style="display:none;">
+            <h2>Loan Details</h2>
+            <div class="loan-results">
+                <div class="loan-item">
+                    <h3>Monthly EMI</h3>
+                    <p id="emi" class="highlight"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Total Interest</h3>
+                    <p id="interest"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Total Payment</h3>
+                    <p id="total"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/pdf-utils.js') }}"></script>
+<script>
+    let currentData = null;
+
+    async function calculateLoan() {
+        const amount = document.getElementById('amount').value;
+        const rate = document.getElementById('rate').value;
+        const duration = document.getElementById('duration').value;
+
+        if (!amount || !rate || !duration) {
+            alert('Please fill all fields');
+            return;
+        }
+
+        currentData = { amount, rate, duration };
+
+        const response = await fetch('/api/loan', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(currentData)
+        });
+
+        const data = await response.json();
+
+        document.getElementById('emi').textContent = '$' + data.emi;
+        document.getElementById('interest').textContent = '$' + data.total_interest;
+        document.getElementById('total').textContent = '$' + data.total_payment;
+        document.getElementById('result').style.display = 'block';
+
+        addPDFDownloadButton('result', '/api/pdf/loan', () => currentData, 'Loan');
+    }
+</script>
+{% endblock %}

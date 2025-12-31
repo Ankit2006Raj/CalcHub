@@ -1,0 +1,232 @@
+{% extends "base.html" %}
+
+{% block title %}Discount Calculator - CalcHub{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>Discount Calculator</h1>
+    <div class="calc-container">
+        <div class="input-group">
+            <label>Calculation Type</label>
+            <select id="calc_type" onchange="toggleInputs()">
+                <option value="simple">Simple Discount</option>
+                <option value="multiple">Multiple Discounts</option>
+                <option value="bulk">Bulk Discount</option>
+            </select>
+        </div>
+
+        <div id="simple_inputs">
+            <div class="input-group">
+                <label>Original Price ($)</label>
+                <input type="number" step="0.01" id="original_price" placeholder="Enter original price">
+            </div>
+            <div class="input-group">
+                <label>Discount Method</label>
+                <select id="discount_method" onchange="toggleDiscountInputs()">
+                    <option value="percent">Discount Percentage</option>
+                    <option value="amount">Discount Amount</option>
+                    <option value="sale">Sale Price</option>
+                </select>
+            </div>
+            <div class="input-group" id="percent_input">
+                <label>Discount Percentage (%)</label>
+                <input type="number" step="0.1" id="discount_percent" placeholder="Enter discount %">
+            </div>
+            <div class="input-group" id="amount_input" style="display:none;">
+                <label>Discount Amount ($)</label>
+                <input type="number" step="0.01" id="discount_amount" placeholder="Enter discount amount">
+            </div>
+            <div class="input-group" id="sale_input" style="display:none;">
+                <label>Sale Price ($)</label>
+                <input type="number" step="0.01" id="sale_price" placeholder="Enter sale price">
+            </div>
+        </div>
+
+        <div id="multiple_inputs" style="display:none;">
+            <div class="input-group">
+                <label>Original Price ($)</label>
+                <input type="number" step="0.01" id="multi_original_price" placeholder="Enter original price">
+            </div>
+            <div class="input-group">
+                <label>Discount 1 (%)</label>
+                <input type="number" step="0.1" id="discount1" placeholder="First discount">
+            </div>
+            <div class="input-group">
+                <label>Discount 2 (%)</label>
+                <input type="number" step="0.1" id="discount2" placeholder="Second discount">
+            </div>
+            <div class="input-group">
+                <label>Discount 3 (%) - Optional</label>
+                <input type="number" step="0.1" id="discount3" placeholder="Third discount">
+            </div>
+        </div>
+
+        <div id="bulk_inputs" style="display:none;">
+            <div class="input-group">
+                <label>Unit Price ($)</label>
+                <input type="number" step="0.01" id="unit_price" placeholder="Price per unit">
+            </div>
+            <div class="input-group">
+                <label>Quantity</label>
+                <input type="number" id="quantity" placeholder="Number of units">
+            </div>
+            <p><small>Bulk discounts: 10+ units (5%), 50+ units (10%), 100+ units (15%)</small></p>
+        </div>
+
+        <button class="btn-primary" onclick="calculateDiscount()">Calculate Discount</button>
+
+        <div id="result" class="result-box" style="display:none;">
+            <h2>Discount Results</h2>
+            <div id="simple_result" class="loan-results">
+                <div class="loan-item">
+                    <h3>Original Price</h3>
+                    <p id="orig_price"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Discount</h3>
+                    <p id="discount_info" class="highlight"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Final Price</h3>
+                    <p id="final_price" class="highlight"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>You Save</h3>
+                    <p id="savings"></p>
+                </div>
+            </div>
+            <div id="multiple_result" style="display:none;"></div>
+            <div id="bulk_result" style="display:none;"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleInputs() {
+        const type = document.getElementById('calc_type').value;
+        document.getElementById('simple_inputs').style.display = type === 'simple' ? 'block' : 'none';
+        document.getElementById('multiple_inputs').style.display = type === 'multiple' ? 'block' : 'none';
+        document.getElementById('bulk_inputs').style.display = type === 'bulk' ? 'block' : 'none';
+        document.getElementById('result').style.display = 'none';
+    }
+
+    function toggleDiscountInputs() {
+        const method = document.getElementById('discount_method').value;
+        document.getElementById('percent_input').style.display = method === 'percent' ? 'block' : 'none';
+        document.getElementById('amount_input').style.display = method === 'amount' ? 'block' : 'none';
+        document.getElementById('sale_input').style.display = method === 'sale' ? 'block' : 'none';
+    }
+
+    async function calculateDiscount() {
+        const type = document.getElementById('calc_type').value;
+        let requestData = { type };
+
+        if (type === 'simple') {
+            const original_price = document.getElementById('original_price').value;
+            const method = document.getElementById('discount_method').value;
+
+            if (!original_price) {
+                alert('Please enter original price');
+                return;
+            }
+
+            requestData.original_price = parseFloat(original_price);
+
+            if (method === 'percent') {
+                const discount_percent = document.getElementById('discount_percent').value;
+                if (!discount_percent) {
+                    alert('Please enter discount percentage');
+                    return;
+                }
+                requestData.discount_percent = parseFloat(discount_percent);
+            } else if (method === 'amount') {
+                const discount_amount = document.getElementById('discount_amount').value;
+                if (!discount_amount) {
+                    alert('Please enter discount amount');
+                    return;
+                }
+                requestData.discount_amount = parseFloat(discount_amount);
+            } else {
+                const sale_price = document.getElementById('sale_price').value;
+                if (!sale_price) {
+                    alert('Please enter sale price');
+                    return;
+                }
+                requestData.sale_price = parseFloat(sale_price);
+            }
+        } else if (type === 'multiple') {
+            const original_price = document.getElementById('multi_original_price').value;
+            const d1 = document.getElementById('discount1').value;
+            const d2 = document.getElementById('discount2').value;
+            const d3 = document.getElementById('discount3').value;
+
+            if (!original_price || !d1 || !d2) {
+                alert('Please fill required fields');
+                return;
+            }
+
+            requestData.original_price = parseFloat(original_price);
+            requestData.discounts = [parseFloat(d1), parseFloat(d2)];
+            if (d3) requestData.discounts.push(parseFloat(d3));
+        } else {
+            const unit_price = document.getElementById('unit_price').value;
+            const quantity = document.getElementById('quantity').value;
+
+            if (!unit_price || !quantity) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            requestData.unit_price = parseFloat(unit_price);
+            requestData.quantity = parseInt(quantity);
+        }
+
+        const response = await fetch('/api/discount', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(requestData)
+        });
+
+        const data = await response.json();
+        displayResults(data, type);
+    }
+
+    function displayResults(data, type) {
+        if (type === 'simple') {
+            document.getElementById('orig_price').textContent = '$' + data.original_price.toFixed(2);
+            document.getElementById('discount_info').textContent = data.discount_percent.toFixed(1) + '% ($' + data.discount_amount.toFixed(2) + ')';
+            document.getElementById('final_price').textContent = '$' + data.final_price.toFixed(2);
+            document.getElementById('savings').textContent = '$' + data.you_save.toFixed(2);
+            document.getElementById('simple_result').style.display = 'grid';
+            document.getElementById('multiple_result').style.display = 'none';
+            document.getElementById('bulk_result').style.display = 'none';
+        } else if (type === 'multiple') {
+            let html = '<h3>Multiple Discounts Applied</h3>';
+            html += '<p><strong>Original Price:</strong> $' + data.original_price.toFixed(2) + '</p>';
+            data.breakdown.forEach(step => {
+                html += '<p>Step ' + step.step + ': ' + step.discount_percent + '% off → $' + step.price_after.toFixed(2) + '</p>';
+            });
+            html += '<p><strong>Final Price:</strong> $' + data.final_price.toFixed(2) + '</p>';
+            html += '<p><strong>Total Savings:</strong> $' + data.total_savings.toFixed(2) + ' (' + data.effective_discount_percent.toFixed(1) + '%)</p>';
+            document.getElementById('multiple_result').innerHTML = html;
+            document.getElementById('simple_result').style.display = 'none';
+            document.getElementById('multiple_result').style.display = 'block';
+            document.getElementById('bulk_result').style.display = 'none';
+        } else {
+            let html = '<h3>Bulk Purchase Discount</h3>';
+            html += '<p><strong>Unit Price:</strong> $' + data.unit_price.toFixed(2) + '</p>';
+            html += '<p><strong>Quantity:</strong> ' + data.quantity + '</p>';
+            html += '<p><strong>Discount Applied:</strong> ' + data.discount_percent + '%</p>';
+            html += '<p><strong>Original Total:</strong> $' + data.original_total.toFixed(2) + '</p>';
+            html += '<p><strong>Final Total:</strong> $' + data.final_total.toFixed(2) + '</p>';
+            html += '<p><strong>Final Unit Price:</strong> $' + data.final_unit_price.toFixed(2) + '</p>';
+            html += '<p><strong>Total Savings:</strong> $' + data.discount_amount.toFixed(2) + '</p>';
+            document.getElementById('bulk_result').innerHTML = html;
+            document.getElementById('simple_result').style.display = 'none';
+            document.getElementById('multiple_result').style.display = 'none';
+            document.getElementById('bulk_result').style.display = 'block';
+        }
+        document.getElementById('result').style.display = 'block';
+    }
+</script>
+{% endblock %}

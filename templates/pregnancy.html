@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Pregnancy Due Date Calculator - CalcHub{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>Pregnancy Due Date Calculator</h1>
+    <div class="calc-container">
+        <div class="input-group">
+            <label>First Day of Last Period</label>
+            <input type="date" id="lastPeriod">
+        </div>
+        <button class="btn-primary" onclick="calculateDueDate()">Calculate Due Date</button>
+
+        <div id="result" class="result-box" style="display:none;">
+            <h2>Estimated Due Date</h2>
+            <p class="due-date" id="dueDate"></p>
+            <div class="pregnancy-info">
+                <div class="info-item">
+                    <h3>Weeks Pregnant</h3>
+                    <p id="weeks"></p>
+                </div>
+                <div class="info-item">
+                    <h3>Days Remaining</h3>
+                    <p id="daysRemaining"></p>
+                </div>
+                <div class="info-item">
+                    <h3>Trimester</h3>
+                    <p id="trimester"></p>
+                </div>
+            </div>
+            <p>Conception Date: <span id="conception"></span></p>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/pdf-utils.js') }}"></script>
+<script>
+    let currentData = null;
+
+    async function calculateDueDate() {
+        const lastPeriod = document.getElementById('lastPeriod').value;
+
+        if (!lastPeriod) {
+            alert('Please select the date');
+            return;
+        }
+
+        currentData = { last_period: lastPeriod };
+
+        const response = await fetch('/api/pregnancy', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(currentData)
+        });
+
+        const data = await response.json();
+
+        document.getElementById('dueDate').textContent = new Date(data.due_date).toLocaleDateString();
+        document.getElementById('weeks').textContent = data.weeks_pregnant + ' weeks';
+        document.getElementById('daysRemaining').textContent = data.days_remaining + ' days';
+        document.getElementById('trimester').textContent = 'Trimester ' + data.trimester;
+        document.getElementById('conception').textContent = new Date(data.conception_date).toLocaleDateString();
+        document.getElementById('result').style.display = 'block';
+
+        addPDFDownloadButton('result', '/api/pdf/pregnancy', () => currentData, 'Pregnancy');
+    }
+</script>
+{% endblock %}

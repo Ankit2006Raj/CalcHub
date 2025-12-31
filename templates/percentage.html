@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Percentage Calculator - CalcHub{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>Marks Percentage Calculator</h1>
+    <div class="calc-container">
+        <div id="subjects">
+            <div class="subject-row">
+                <input type="text" placeholder="Subject name" class="subject-name">
+                <input type="number" placeholder="Scored" class="marks-scored">
+                <input type="number" placeholder="Max marks" class="marks-max">
+            </div>
+        </div>
+        <button class="btn-secondary" onclick="addSubject()">+ Add Subject</button>
+        <button class="btn-primary" onclick="calculatePercentage()">Calculate Percentage</button>
+
+        <div id="result" class="result-box" style="display:none;">
+            <h2>Total Percentage: <span id="totalPercentage"></span>%</h2>
+            <div class="percentage-bar">
+                <div id="percentageBar" class="percentage-fill"></div>
+            </div>
+            <p>Total: <span id="totalScored"></span> / <span id="totalMax"></span></p>
+            <div id="subjectResults"></div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/pdf-utils.js') }}"></script>
+<script>
+    function addSubject() {
+        const subjectRow = document.createElement('div');
+        subjectRow.className = 'subject-row';
+        subjectRow.innerHTML = `
+        <input type="text" placeholder="Subject name" class="subject-name">
+        <input type="number" placeholder="Scored" class="marks-scored">
+        <input type="number" placeholder="Max marks" class="marks-max">
+    `;
+        document.getElementById('subjects').appendChild(subjectRow);
+    }
+
+    let currentData = null;
+
+    async function calculatePercentage() {
+        const rows = document.querySelectorAll('.subject-row');
+        const marks = [];
+
+        rows.forEach(row => {
+            const subject = row.querySelector('.subject-name').value || 'Subject';
+            const scored = row.querySelector('.marks-scored').value;
+            const max = row.querySelector('.marks-max').value;
+            if (scored && max) {
+                marks.push({ subject, scored: parseFloat(scored), max: parseFloat(max) });
+            }
+        });
+
+        if (marks.length === 0) {
+            alert('Please add at least one subject');
+            return;
+        }
+
+        currentData = { marks };
+
+        try {
+            const response = await fetch('/api/percentage', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(currentData)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Calculation failed');
+            }
+
+            document.getElementById('totalPercentage').textContent = data.percentage;
+            document.getElementById('totalScored').textContent = data.total_scored;
+            document.getElementById('totalMax').textContent = data.total_max;
+            document.getElementById('percentageBar').style.width = data.percentage + '%';
+
+            let subjectHTML = '<h3>Subject-wise Results:</h3>';
+            data.subjects.forEach(sub => {
+                subjectHTML += `<p>${sub.subject}: ${sub.percentage}% (${sub.scored}/${sub.max})</p>`;
+            });
+            document.getElementById('subjectResults').innerHTML = subjectHTML;
+
+            document.getElementById('result').style.display = 'block';
+
+            addPDFDownloadButton('result', '/api/pdf/percentage', () => currentData, 'Percentage');
+        } catch (error) {
+            alert('Error: ' + error.message);
+            console.error('Calculation error:', error);
+        }
+    }
+</script>
+{% endblock %}

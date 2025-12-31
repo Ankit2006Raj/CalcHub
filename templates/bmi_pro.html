@@ -1,0 +1,334 @@
+{% extends "base.html" %}
+
+{% block title %}BMI Calculator Pro - CalcHub{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ai-features.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pro-features.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>🏋️ BMI Calculator Pro</h1>
+
+    <!-- Calculator Input Section -->
+    <div class="calc-container">
+        <div class="input-group">
+            <label>Height (cm)</label>
+            <input type="number" id="height" placeholder="Enter height in cm">
+        </div>
+        <div class="input-group">
+            <label>Weight (kg)</label>
+            <input type="number" id="weight" placeholder="Enter weight in kg">
+        </div>
+
+        <div class="action-buttons">
+            <button class="action-btn primary" onclick="calculateBMI()">
+                <i class="fas fa-calculator"></i> Calculate BMI
+            </button>
+        </div>
+
+        <!-- Results Section -->
+        <div id="result" class="result-box" style="display:none;">
+            <h2>Your BMI: <span id="bmiValue" class="animated-number"></span></h2>
+            <div class="bmi-bar">
+                <div id="bmiIndicator" class="bmi-indicator"></div>
+            </div>
+            <p class="category" id="category"></p>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button class="action-btn success" onclick="downloadPDF()">
+                    <i class="fas fa-file-pdf"></i> Download PDF
+                </button>
+                <button class="action-btn primary" onclick="showShareOptions()">
+                    <i class="fas fa-share-alt"></i> Share Results
+                </button>
+                <button class="action-btn secondary" onclick="saveToHistory()">
+                    <i class="fas fa-save"></i> Save to History
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabs for Different Sections -->
+    <div class="tabs">
+        <button class="tab active" onclick="switchTab('analytics')">
+            <i class="fas fa-chart-line"></i> Analytics
+        </button>
+        <button class="tab" onclick="switchTab('history')">
+            <i class="fas fa-history"></i> History
+        </button>
+        <button class="tab" onclick="switchTab('insights')">
+            <i class="fas fa-lightbulb"></i> Insights
+        </button>
+        <button class="tab" onclick="switchTab('share')">
+            <i class="fas fa-share-alt"></i> Share
+        </button>
+    </div>
+
+    <!-- Analytics Tab -->
+    <div id="analytics-tab" class="tab-content active">
+        <div class="analytics-section">
+            <h2><i class="fas fa-chart-line"></i> BMI Trends & Analytics</h2>
+            <div class="chart-container">
+                <canvas id="bmiTrendChart"></canvas>
+            </div>
+            <div id="analytics-insights"></div>
+        </div>
+    </div>
+
+    <!-- History Tab -->
+    <div id="history-tab" class="tab-content">
+        <div class="history-section">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2><i class="fas fa-history"></i> Calculation History</h2>
+                <button class="action-btn danger" onclick="clearAllHistory()">
+                    <i class="fas fa-trash"></i> Clear All
+                </button>
+            </div>
+            <div id="history-container"></div>
+        </div>
+
+        <!-- Monthly Summary -->
+        <div id="monthly-summary-container"></div>
+    </div>
+
+    <!-- Insights Tab -->
+    <div id="insights-tab" class="tab-content">
+        <div class="analytics-section">
+            <h2><i class="fas fa-lightbulb"></i> AI-Powered Insights</h2>
+            <div id="insights-container"></div>
+
+            <!-- AI Recommendations -->
+            <div id="ai-recommendations" style="margin-top: 20px;"></div>
+        </div>
+    </div>
+
+    <!-- Share Tab -->
+    <div id="share-tab" class="tab-content">
+        <div class="share-section">
+            <!-- Share Buttons -->
+            <div id="share-buttons-container"></div>
+
+            <!-- Share Card -->
+            <div id="share-card-container"></div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="{{ url_for('static', filename='js/pdf-utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ai-features.js') }}"></script>
+<script src="{{ url_for('static', filename='js/pro-features.js') }}"></script>
+
+<script>
+    let currentData = null;
+    let currentResult = null;
+
+    // Initialize on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        loadHistory();
+        loadAnalytics();
+        analyticsManager.displayMonthlySummary('monthly-summary-container');
+    });
+
+    async function calculateBMI() {
+        const height = document.getElementById('height').value;
+        const weight = document.getElementById('weight').value;
+
+        if (!height || !weight) {
+            showNotification('Please enter both height and weight', 'warning');
+            return;
+        }
+
+        currentData = { height, weight };
+
+        try {
+            const response = await fetch('/api/bmi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(currentData)
+            });
+
+            const data = await response.json();
+            currentResult = data;
+
+            // Display results
+            document.getElementById('bmiValue').textContent = data.bmi;
+            document.getElementById('category').textContent = data.category;
+            document.getElementById('category').style.color = data.color;
+            document.getElementById('bmiIndicator').style.left = ((data.bmi / 40) * 100) + '%';
+            document.getElementById('bmiIndicator').style.backgroundColor = data.color;
+            document.getElementById('result').style.display = 'block';
+
+            // Animate number
+            animateNumber('bmiValue', 0, data.bmi, 1000);
+
+            // Auto-save to history
+            await saveToHistory();
+
+            // Reload analytics
+            await loadAnalytics();
+
+            showNotification('BMI calculated successfully!', 'success');
+        } catch (error) {
+            console.error('Error calculating BMI:', error);
+            showNotification('Error calculating BMI', 'error');
+        }
+    }
+
+    async function saveToHistory() {
+        if (!currentData || !currentResult) {
+            showNotification('No calculation to save', 'warning');
+            return;
+        }
+
+        const result = await historyManager.saveCalculation('bmi', currentData, currentResult);
+        if (result.success) {
+            showNotification('Saved to history!', 'success');
+            loadHistory();
+        }
+    }
+
+    function loadHistory() {
+        historyManager.displayHistory('history-container', 'bmi');
+    }
+
+    async function loadAnalytics() {
+        await analyticsManager.displayChart('bmiTrendChart', 'bmi');
+        await analyticsManager.displayInsights('analytics-insights', 'bmi');
+        await analyticsManager.displayInsights('insights-container', 'bmi');
+
+        // Load AI recommendations
+        if (currentResult) {
+            loadAIRecommendations();
+        }
+    }
+
+    async function loadAIRecommendations() {
+        try {
+            const response = await fetch('/api/ai/bmi-recommendations', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(currentData)
+            });
+            const recommendations = await response.json();
+            displayAIRecommendations(recommendations);
+        } catch (error) {
+            console.error('Error loading AI recommendations:', error);
+        }
+    }
+
+    function displayAIRecommendations(recommendations) {
+        const container = document.getElementById('ai-recommendations');
+        if (!container) return;
+
+        let html = '<div class="recommendations-section">';
+        html += '<h3>🤖 AI-Powered Recommendations</h3>';
+
+        if (recommendations.diet_plan) {
+            html += '<h4>🍽️ Diet Plan</h4><ul>';
+            recommendations.diet_plan.forEach(meal => {
+                html += `<li><strong>${meal.meal}:</strong> ${meal.items.join(', ')} (${meal.calories} cal)</li>`;
+            });
+            html += '</ul>';
+        }
+
+        if (recommendations.workout_plan) {
+            html += '<h4>💪 Workout Plan</h4><ul>';
+            recommendations.workout_plan.forEach(day => {
+                html += `<li><strong>${day.day}:</strong> ${day.focus} - ${day.exercises.join(', ')}</li>`;
+            });
+            html += '</ul>';
+        }
+
+        html += '</div>';
+        container.innerHTML = html;
+    }
+
+    function showShareOptions() {
+        if (!currentResult || !currentData) {
+            showNotification('Calculate BMI first', 'warning');
+            return;
+        }
+
+        // Switch to share tab
+        switchTab('share');
+
+        // Display share buttons
+        sharingManager.displayShareButtons('share-buttons-container', 'bmi', currentResult, currentData);
+
+        // Generate share card
+        sharingManager.generateShareCard('share-card-container', 'bmi', currentResult, currentData);
+    }
+
+    async function downloadPDF() {
+        if (!currentData) {
+            showNotification('Calculate BMI first', 'warning');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/pdf/bmi', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(currentData)
+            });
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `BMI_Report_${new Date().toISOString().split('T')[0]}.pdf`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+
+            showNotification('PDF downloaded successfully!', 'success');
+        } catch (error) {
+            console.error('Error downloading PDF:', error);
+            showNotification('Error downloading PDF', 'error');
+        }
+    }
+
+    async function clearAllHistory() {
+        if (!confirm('Are you sure you want to clear all BMI history?')) return;
+
+        const result = await historyManager.clearHistory('bmi');
+        if (result.success) {
+            showNotification('History cleared!', 'success');
+            loadHistory();
+            loadAnalytics();
+        }
+    }
+
+    function switchTab(tabName) {
+        // Remove active class from all tabs and contents
+        document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+        // Add active class to selected tab and content
+        event.target.closest('.tab').classList.add('active');
+        document.getElementById(`${tabName}-tab`).classList.add('active');
+    }
+
+    function animateNumber(elementId, start, end, duration) {
+        const element = document.getElementById(elementId);
+        const range = end - start;
+        const increment = range / (duration / 16);
+        let current = start;
+
+        const timer = setInterval(() => {
+            current += increment;
+            if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                current = end;
+                clearInterval(timer);
+            }
+            element.textContent = current.toFixed(1);
+        }, 16);
+    }
+</script>
+{% endblock %}

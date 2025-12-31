@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Math Calculator - CalcHub{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>Scientific Calculator</h1>
+    <div class="calc-container math-calc">
+        <div class="calculator-display">
+            <input type="text" id="display" readonly>
+            <input type="text" id="expression" placeholder="Enter expression">
+        </div>
+
+        <div class="calculator-buttons">
+            <button onclick="appendToExpression('sin(')">sin</button>
+            <button onclick="appendToExpression('cos(')">cos</button>
+            <button onclick="appendToExpression('tan(')">tan</button>
+            <button onclick="appendToExpression('sqrt(')">√</button>
+
+            <button onclick="appendToExpression('7')">7</button>
+            <button onclick="appendToExpression('8')">8</button>
+            <button onclick="appendToExpression('9')">9</button>
+            <button onclick="appendToExpression('/')">/</button>
+
+            <button onclick="appendToExpression('4')">4</button>
+            <button onclick="appendToExpression('5')">5</button>
+            <button onclick="appendToExpression('6')">6</button>
+            <button onclick="appendToExpression('*')">×</button>
+
+            <button onclick="appendToExpression('1')">1</button>
+            <button onclick="appendToExpression('2')">2</button>
+            <button onclick="appendToExpression('3')">3</button>
+            <button onclick="appendToExpression('-')">-</button>
+
+            <button onclick="appendToExpression('0')">0</button>
+            <button onclick="appendToExpression('.')">.</button>
+            <button onclick="calculateMath()">=</button>
+            <button onclick="appendToExpression('+')">+</button>
+
+            <button onclick="appendToExpression('(')">(</button>
+            <button onclick="appendToExpression(')')">)</button>
+            <button onclick="appendToExpression('^')">^</button>
+            <button onclick="clearExpression()">C</button>
+        </div>
+
+        <div class="math-info">
+            <p>Supported functions: sin, cos, tan, sqrt, log, ln, ^</p>
+            <p>Example: sin(30) + sqrt(16) * 2</p>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/pdf-utils.js') }}"></script>
+<script>
+    function appendToExpression(value) {
+        document.getElementById('expression').value += value;
+    }
+
+    function clearExpression() {
+        document.getElementById('expression').value = '';
+        document.getElementById('display').value = '';
+    }
+
+    let currentData = null;
+
+    async function calculateMath() {
+        const expression = document.getElementById('expression').value;
+
+        if (!expression) {
+            alert('Please enter an expression');
+            return;
+        }
+
+        currentData = { expression };
+
+        const response = await fetch('/api/math', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(currentData)
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            document.getElementById('display').value = data.result;
+            // Add PDF button to calculator display area
+            const displayArea = document.querySelector('.calculator-display');
+            addPDFDownloadButton('display', '/api/pdf/math', () => currentData, 'Math');
+        } else {
+            alert('Error: ' + data.error);
+        }
+    }
+</script>
+{% endblock %}

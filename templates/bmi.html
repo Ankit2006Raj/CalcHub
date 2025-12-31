@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}BMI Calculator - CalcHub{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/ai-features.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>BMI Calculator</h1>
+    <div class="calc-container">
+        <div class="input-group">
+            <label>Height (cm)</label>
+            <input type="number" id="height" placeholder="Enter height in cm">
+        </div>
+        <div class="input-group">
+            <label>Weight (kg)</label>
+            <input type="number" id="weight" placeholder="Enter weight in kg">
+        </div>
+        <button class="btn-primary" onclick="calculateBMI()">Calculate BMI</button>
+
+        <div id="result" class="result-box" style="display:none;">
+            <h2>Your BMI: <span id="bmiValue" class="animated-number"></span></h2>
+            <div class="bmi-bar">
+                <div id="bmiIndicator" class="bmi-indicator"></div>
+            </div>
+            <p class="category" id="category"></p>
+
+            <!-- BMI Progress Chart -->
+            <div class="chart-container" id="bmi-chart-container" style="display:none;">
+                <canvas id="bmiProgressChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/pdf-utils.js') }}"></script>
+<script src="{{ url_for('static', filename='js/ai-features.js') }}"></script>
+<script>
+    let currentData = null;
+    let currentResult = null;
+
+    // Initialize AI features
+    document.addEventListener('DOMContentLoaded', () => {
+        initAIFeatures('bmi');
+    });
+
+    async function calculateBMI() {
+        const height = document.getElementById('height').value;
+        const weight = document.getElementById('weight').value;
+
+        if (!height || !weight) {
+            alert('Please enter both height and weight');
+            return;
+        }
+
+        currentData = { height, weight };
+
+        const response = await fetch('/api/bmi', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(currentData)
+        });
+
+        const data = await response.json();
+        currentResult = data;
+
+        document.getElementById('bmiValue').textContent = data.bmi;
+        document.getElementById('category').textContent = data.category;
+        document.getElementById('category').style.color = data.color;
+        document.getElementById('bmiIndicator').style.left = ((data.bmi / 40) * 100) + '%';
+        document.getElementById('bmiIndicator').style.backgroundColor = data.color;
+        document.getElementById('result').style.display = 'block';
+
+        // Animate number
+        animateNumber('bmiValue', 0, data.bmi, 1000);
+
+        // Add PDF download button
+        addPDFDownloadButton('result', '/api/pdf/bmi', () => currentData, 'BMI');
+
+        // Add AI features buttons
+        addAIButton('result', 'bmi', () => currentData);
+        addSmartExplainButton('result', 'bmi', () => currentResult, () => currentData);
+
+        // Show BMI progress chart
+        showBMIChart(data.bmi);
+    }
+
+    function animateNumber(elementId, start, end, duration) {
+        const element = document.getElementById(elementId);
+        const range = end - start;
+        const increment = range / (duration / 16);
+        let current = start;
+
+        const timer = setInterval(() => {
+            current += increment;
+            if ((increment > 0 && current >= end) || (increment < 0 && current <= end)) {
+                current = end;
+                clearInterval(timer);
+            }
+            element.textContent = current.toFixed(1);
+        }, 16);
+    }
+
+    function showBMIChart(currentBMI) {
+        const bmiHistory = [
+            { date: '3 months ago', bmi: currentBMI + 2 },
+            { date: '2 months ago', bmi: currentBMI + 1.5 },
+            { date: '1 month ago', bmi: currentBMI + 0.8 },
+            { date: 'Today', bmi: currentBMI }
+        ];
+
+        document.getElementById('bmi-chart-container').style.display = 'block';
+        createBMIProgressChart('bmiProgressChart', bmiHistory);
+    }
+</script>
+{% endblock %}

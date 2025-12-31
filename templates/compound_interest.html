@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Compound Interest Calculator - CalcHub{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>Compound Interest Calculator</h1>
+    <div class="calc-container">
+        <div class="input-group">
+            <label>Principal Amount ($)</label>
+            <input type="number" id="principal" placeholder="Enter principal amount">
+        </div>
+        <div class="input-group">
+            <label>Interest Rate (% per year)</label>
+            <input type="number" step="0.1" id="rate" placeholder="Enter interest rate">
+        </div>
+        <div class="input-group">
+            <label>Time Period (years)</label>
+            <input type="number" id="time" placeholder="Enter time period">
+        </div>
+        <div class="input-group">
+            <label>Compounding Frequency</label>
+            <select id="frequency">
+                <option value="1">Annually</option>
+                <option value="4">Quarterly</option>
+                <option value="12">Monthly</option>
+                <option value="365">Daily</option>
+            </select>
+        </div>
+        <button class="btn-primary" onclick="calculateCI()">Calculate Interest</button>
+
+        <div id="result" class="result-box" style="display:none;">
+            <h2>Results</h2>
+            <div class="ci-results">
+                <div class="ci-item">
+                    <h3>Compound Interest</h3>
+                    <p id="interest" class="highlight"></p>
+                </div>
+                <div class="ci-item">
+                    <h3>Total Amount</h3>
+                    <p id="totalAmount"></p>
+                </div>
+            </div>
+            <div id="breakdown"></div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/pdf-utils.js') }}"></script>
+<script>
+    let currentData = null;
+
+    async function calculateCI() {
+        const principal = document.getElementById('principal').value;
+        const rate = document.getElementById('rate').value;
+        const time = document.getElementById('time').value;
+        const frequency = document.getElementById('frequency').value;
+
+        if (!principal || !rate || !time) {
+            alert('Please fill all fields');
+            return;
+        }
+
+        currentData = { principal, rate, time, frequency };
+
+        const response = await fetch('/api/compound-interest', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(currentData)
+        });
+
+        const data = await response.json();
+
+        document.getElementById('interest').textContent = '$' + data.compound_interest;
+        document.getElementById('totalAmount').textContent = '$' + data.total_amount;
+
+        let breakdownHTML = '<h3>Year-wise Breakdown:</h3><div class="breakdown-list">';
+        data.breakdown.forEach(item => {
+            breakdownHTML += `<p>Year ${item.year}: ${item.amount} (Interest: ${item.interest})</p>`;
+        });
+        breakdownHTML += '</div>';
+        document.getElementById('breakdown').innerHTML = breakdownHTML;
+
+        document.getElementById('result').style.display = 'block';
+
+        addPDFDownloadButton('result', '/api/pdf/compound-interest', () => currentData, 'Compound Interest');
+    }
+</script>
+{% endblock %}

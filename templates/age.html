@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Age Calculator - CalcHub{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>Age Calculator</h1>
+    <div class="calc-container">
+        <div class="input-group">
+            <label>Date of Birth</label>
+            <input type="date" id="dob">
+        </div>
+        <button class="btn-primary" onclick="calculateAge()">Calculate Age</button>
+
+        <div id="result" class="result-box" style="display:none;">
+            <h2>Your Age</h2>
+            <div class="age-display">
+                <div class="age-item">
+                    <h3 id="years"></h3>
+                    <p>Years</p>
+                </div>
+                <div class="age-item">
+                    <h3 id="months"></h3>
+                    <p>Months</p>
+                </div>
+                <div class="age-item">
+                    <h3 id="days"></h3>
+                    <p>Days</p>
+                </div>
+            </div>
+            <div class="age-details">
+                <p>Total Days: <span id="totalDays"></span></p>
+                <p>Total Weeks: <span id="totalWeeks"></span></p>
+                <p>Total Months: <span id="totalMonths"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/pdf-utils.js') }}"></script>
+<script>
+    let currentData = null;
+
+    async function calculateAge() {
+        const dob = document.getElementById('dob').value;
+
+        if (!dob) {
+            alert('Please select date of birth');
+            return;
+        }
+
+        currentData = { dob };
+
+        const response = await fetch('/api/age', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(currentData)
+        });
+
+        const data = await response.json();
+
+        document.getElementById('years').textContent = data.years;
+        document.getElementById('months').textContent = data.months;
+        document.getElementById('days').textContent = data.days;
+        document.getElementById('totalDays').textContent = data.total_days;
+        document.getElementById('totalWeeks').textContent = data.total_weeks;
+        document.getElementById('totalMonths').textContent = data.total_months;
+        document.getElementById('result').style.display = 'block';
+
+        addPDFDownloadButton('result', '/api/pdf/age', () => currentData, 'Age');
+    }
+</script>
+{% endblock %}

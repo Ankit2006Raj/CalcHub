@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}GPA Calculator - CalcHub{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>GPA Calculator</h1>
+    <div class="calc-container">
+        <div id="courses">
+            <div class="course-row">
+                <input type="text" placeholder="Course name" class="course-name">
+                <select class="course-grade">
+                    <option value="A+">A+</option>
+                    <option value="A">A</option>
+                    <option value="A-">A-</option>
+                    <option value="B+">B+</option>
+                    <option value="B">B</option>
+                    <option value="B-">B-</option>
+                    <option value="C+">C+</option>
+                    <option value="C">C</option>
+                    <option value="C-">C-</option>
+                    <option value="D+">D+</option>
+                    <option value="D">D</option>
+                    <option value="F">F</option>
+                </select>
+                <input type="number" placeholder="Credits" class="course-credits">
+            </div>
+        </div>
+        <button class="btn-secondary" onclick="addCourse()">+ Add Course</button>
+        <button class="btn-primary" onclick="calculateGPA()">Calculate GPA</button>
+
+        <div id="result" class="result-box" style="display:none;">
+            <h2>Your GPA: <span id="gpaValue"></span></h2>
+            <p>Grade: <span id="grade"></span></p>
+            <p>Total Credits: <span id="credits"></span></p>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/pdf-utils.js') }}"></script>
+<script>
+    function addCourse() {
+        const courseRow = document.createElement('div');
+        courseRow.className = 'course-row';
+        courseRow.innerHTML = `
+        <input type="text" placeholder="Course name" class="course-name">
+        <select class="course-grade">
+            <option value="A+">A+</option>
+            <option value="A">A</option>
+            <option value="A-">A-</option>
+            <option value="B+">B+</option>
+            <option value="B">B</option>
+            <option value="B-">B-</option>
+            <option value="C+">C+</option>
+            <option value="C">C</option>
+            <option value="C-">C-</option>
+            <option value="D+">D+</option>
+            <option value="D">D</option>
+            <option value="F">F</option>
+        </select>
+        <input type="number" placeholder="Credits" class="course-credits">
+    `;
+        document.getElementById('courses').appendChild(courseRow);
+    }
+
+    let currentData = null;
+
+    async function calculateGPA() {
+        const rows = document.querySelectorAll('.course-row');
+        const courses = [];
+
+        rows.forEach(row => {
+            const name = row.querySelector('.course-name').value;
+            const grade = row.querySelector('.course-grade').value;
+            const credits = row.querySelector('.course-credits').value;
+            if (credits) {
+                courses.push({ name: name || 'Course', grade, credits });
+            }
+        });
+
+        if (courses.length === 0) {
+            alert('Please add at least one course');
+            return;
+        }
+
+        currentData = { courses };
+
+        const response = await fetch('/api/gpa', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(currentData)
+        });
+
+        const data = await response.json();
+
+        document.getElementById('gpaValue').textContent = data.gpa;
+        document.getElementById('grade').textContent = data.grade;
+        document.getElementById('credits').textContent = data.total_credits;
+        document.getElementById('result').style.display = 'block';
+
+        addPDFDownloadButton('result', '/api/pdf/gpa', () => currentData, 'GPA');
+    }
+</script>
+{% endblock %}

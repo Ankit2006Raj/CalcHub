@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Calorie Burn Calculator - CalcHub{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>Calorie Burn Calculator</h1>
+    <div class="calc-container">
+        <div class="input-group">
+            <label>Your Weight</label>
+            <input type="number" step="0.1" id="weight" placeholder="Enter your weight">
+        </div>
+        <div class="input-group">
+            <label>Weight Unit</label>
+            <select id="weight_unit">
+                <option value="kg">Kilograms (kg)</option>
+                <option value="lbs">Pounds (lbs)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Activity</label>
+            <select id="activity">
+                <optgroup label="Walking">
+                    <option value="walking_slow">Walking (2 mph) - Light</option>
+                    <option value="walking_moderate">Walking (3.5 mph) - Moderate</option>
+                    <option value="walking_fast">Walking (4.5 mph) - Fast</option>
+                </optgroup>
+                <optgroup label="Running">
+                    <option value="running_5mph">Running (5 mph)</option>
+                    <option value="running_6mph">Running (6 mph)</option>
+                    <option value="running_8mph">Running (8 mph)</option>
+                </optgroup>
+                <optgroup label="Cycling">
+                    <option value="cycling_leisure">Cycling (Leisure)</option>
+                    <option value="cycling_moderate">Cycling (12-14 mph)</option>
+                    <option value="cycling_vigorous">Cycling (16-19 mph)</option>
+                </optgroup>
+                <optgroup label="Swimming">
+                    <option value="swimming_leisure">Swimming (Leisure)</option>
+                    <option value="swimming_moderate">Swimming (Moderate)</option>
+                    <option value="swimming_vigorous">Swimming (Vigorous)</option>
+                </optgroup>
+                <optgroup label="Gym & Fitness">
+                    <option value="weight_training">Weight Training</option>
+                    <option value="aerobics_low">Aerobics (Low Impact)</option>
+                    <option value="aerobics_high">Aerobics (High Impact)</option>
+                    <option value="yoga">Yoga</option>
+                    <option value="pilates">Pilates</option>
+                    <option value="elliptical">Elliptical</option>
+                    <option value="rowing">Rowing Machine</option>
+                    <option value="stair_climbing">Stair Climbing</option>
+                    <option value="jump_rope">Jump Rope</option>
+                </optgroup>
+                <optgroup label="Sports">
+                    <option value="basketball">Basketball</option>
+                    <option value="soccer">Soccer</option>
+                    <option value="tennis">Tennis</option>
+                    <option value="golf">Golf (Walking)</option>
+                    <option value="bowling">Bowling</option>
+                </optgroup>
+                <optgroup label="Other">
+                    <option value="dancing">Dancing</option>
+                    <option value="hiking">Hiking</option>
+                    <option value="gardening">Gardening</option>
+                    <option value="cleaning">House Cleaning</option>
+                </optgroup>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Duration (minutes)</label>
+            <input type="number" id="duration" placeholder="Enter duration in minutes">
+        </div>
+
+        <button class="btn-primary" onclick="calculateCalorieBurn()">Calculate Calories Burned</button>
+
+        <div id="result" class="result-box" style="display:none;">
+            <h2>Calorie Burn Results</h2>
+            <div class="loan-results">
+                <div class="loan-item">
+                    <h3>Calories Burned</h3>
+                    <p id="calories_burned" class="highlight"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Calories per Minute</h3>
+                    <p id="calories_per_min"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Calories per Hour</h3>
+                    <p id="calories_per_hour"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Intensity Level</h3>
+                    <p id="intensity"></p>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <h3>Activity Details</h3>
+                <p><strong>Activity:</strong> <span id="activity_name"></span></p>
+                <p><strong>Duration:</strong> <span id="duration_display"></span> minutes</p>
+                <p><strong>MET Value:</strong> <span id="met_value"></span></p>
+                <p><strong>Fat Burned:</strong> <span id="fat_burned"></span></p>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <h3>Equivalent Activities</h3>
+                <p>To burn the same calories, you could:</p>
+                <ul id="equivalents"></ul>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <h3>Recommendations</h3>
+                <ul id="recommendations"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function calculateCalorieBurn() {
+        const weight = document.getElementById('weight').value;
+        const weight_unit = document.getElementById('weight_unit').value;
+        const activity = document.getElementById('activity').value;
+        const duration = document.getElementById('duration').value;
+
+        if (!weight || !duration) {
+            alert('Please fill all fields');
+            return;
+        }
+
+        const response = await fetch('/api/calorie-burn', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ weight, weight_unit, activity, duration })
+        });
+
+        const data = await response.json();
+
+        document.getElementById('calories_burned').textContent = data.calories_burned.toFixed(0) + ' cal';
+        document.getElementById('calories_per_min').textContent = data.calories_per_minute.toFixed(1) + ' cal/min';
+        document.getElementById('calories_per_hour').textContent = data.calories_per_hour.toFixed(0) + ' cal/hr';
+        document.getElementById('intensity').textContent = data.intensity;
+        document.getElementById('activity_name').textContent = data.activity;
+        document.getElementById('duration_display').textContent = data.duration_minutes;
+        document.getElementById('met_value').textContent = data.met_value;
+        document.getElementById('fat_burned').textContent = data.fat_burned_lbs.toFixed(4) + ' lbs (' + data.fat_burned_kg.toFixed(4) + ' kg)';
+
+        const equivalentsHtml = `
+            <li>Walk for ${data.equivalents.walking_minutes} minutes</li>
+            <li>Run for ${data.equivalents.running_minutes} minutes</li>
+            <li>Cycle for ${data.equivalents.cycling_minutes} minutes</li>
+            <li>Swim for ${data.equivalents.swimming_minutes} minutes</li>
+        `;
+        document.getElementById('equivalents').innerHTML = equivalentsHtml;
+
+        const recommendationsHtml = data.recommendations.map(rec => `<li>${rec}</li>`).join('');
+        document.getElementById('recommendations').innerHTML = recommendationsHtml;
+
+        document.getElementById('result').style.display = 'block';
+    }
+</script>
+{% endblock %}

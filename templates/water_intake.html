@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Water Intake Calculator - CalcHub{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>Water Intake Calculator</h1>
+    <div class="calc-container">
+        <div class="input-group">
+            <label>Your Weight</label>
+            <input type="number" step="0.1" id="weight" placeholder="Enter your weight">
+        </div>
+        <div class="input-group">
+            <label>Weight Unit</label>
+            <select id="weight_unit">
+                <option value="kg">Kilograms (kg)</option>
+                <option value="lbs">Pounds (lbs)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Gender</label>
+            <select id="gender">
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Age</label>
+            <input type="number" id="age" placeholder="Enter your age" value="30">
+        </div>
+        <div class="input-group">
+            <label>Activity Level</label>
+            <select id="activity_level">
+                <option value="sedentary">Sedentary (Little or no exercise)</option>
+                <option value="light">Light (Exercise 1-3 days/week)</option>
+                <option value="moderate">Moderate (Exercise 3-5 days/week)</option>
+                <option value="active">Active (Exercise 6-7 days/week)</option>
+                <option value="very_active">Very Active (Intense exercise daily)</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Climate</label>
+            <select id="climate">
+                <option value="cold">Cold</option>
+                <option value="moderate" selected>Moderate</option>
+                <option value="hot">Hot</option>
+            </select>
+        </div>
+
+        <div class="input-group">
+            <label>
+                <input type="checkbox" id="pregnant"> Pregnant
+            </label>
+        </div>
+        <div class="input-group">
+            <label>
+                <input type="checkbox" id="breastfeeding"> Breastfeeding
+            </label>
+        </div>
+
+        <button class="btn-primary" onclick="calculateWaterIntake()">Calculate Water Intake</button>
+
+        <div id="result" class="result-box" style="display:none;">
+            <h2>Daily Water Intake Recommendation</h2>
+            <div class="loan-results">
+                <div class="loan-item">
+                    <h3>Total Daily Intake</h3>
+                    <p id="total_liters" class="highlight"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>In Glasses</h3>
+                    <p id="total_glasses"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>In Cups</h3>
+                    <p id="total_cups"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Hourly Intake</h3>
+                    <p id="hourly_intake"></p>
+                </div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <h3>Breakdown</h3>
+                <p><strong>Water to Drink:</strong> <span id="water_to_drink"></span></p>
+                <p><strong>From Food (~20%):</strong> <span id="food_hydration"></span></p>
+                <p><small>Fruits, vegetables, and other foods contribute to your hydration</small></p>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <h3>Suggested Drinking Schedule</h3>
+                <div id="schedule"></div>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <h3>Personalized Recommendations</h3>
+                <ul id="recommendations"></ul>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <h3>Hydration Tips</h3>
+                <ul id="tips"></ul>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <h3>Signs of Dehydration</h3>
+                <ul id="dehydration_signs"></ul>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <h3>Benefits of Proper Hydration</h3>
+                <ul id="benefits"></ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    async function calculateWaterIntake() {
+        const weight = document.getElementById('weight').value;
+        const weight_unit = document.getElementById('weight_unit').value;
+        const gender = document.getElementById('gender').value;
+        const age = document.getElementById('age').value;
+        const activity_level = document.getElementById('activity_level').value;
+        const climate = document.getElementById('climate').value;
+        const pregnant = document.getElementById('pregnant').checked;
+        const breastfeeding = document.getElementById('breastfeeding').checked;
+
+        if (!weight || !age) {
+            alert('Please fill all required fields');
+            return;
+        }
+
+        const response = await fetch('/api/water-intake', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ weight, weight_unit, gender, age, activity_level, climate, pregnant, breastfeeding })
+        });
+
+        const data = await response.json();
+
+        document.getElementById('total_liters').textContent = data.total_intake_liters + ' L (' + data.total_intake_oz.toFixed(0) + ' oz)';
+        document.getElementById('total_glasses').textContent = Math.round(data.total_intake_glasses) + ' glasses (250ml each)';
+        document.getElementById('total_cups').textContent = data.total_intake_cups.toFixed(1) + ' cups (8 oz each)';
+        document.getElementById('hourly_intake').textContent = data.hourly_intake_ml.toFixed(0) + ' ml (' + data.hourly_intake_oz.toFixed(1) + ' oz)';
+
+        document.getElementById('water_to_drink').textContent = data.water_to_drink_liters.toFixed(2) + ' L';
+        document.getElementById('food_hydration').textContent = data.food_hydration_ml.toFixed(0) + ' ml';
+
+        let scheduleHtml = '<table style="width:100%; margin-top:10px;"><tr><th>Time</th><th>Amount</th><th>Note</th></tr>';
+        data.drinking_schedule.forEach(item => {
+            scheduleHtml += `<tr><td>${item.time}</td><td>${item.amount_ml}ml (${item.amount_oz}oz)</td><td>${item.note}</td></tr>`;
+        });
+        scheduleHtml += '</table>';
+        document.getElementById('schedule').innerHTML = scheduleHtml;
+
+        document.getElementById('recommendations').innerHTML = data.recommendations.map(rec => `<li>${rec}</li>`).join('');
+        document.getElementById('tips').innerHTML = data.hydration_tips.map(tip => `<li>${tip}</li>`).join('');
+        document.getElementById('dehydration_signs').innerHTML = data.signs_of_dehydration.map(sign => `<li>${sign}</li>`).join('');
+        document.getElementById('benefits').innerHTML = data.benefits.map(benefit => `<li>${benefit}</li>`).join('');
+
+        document.getElementById('result').style.display = 'block';
+    }
+</script>
+
+<style>
+    table {
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    th,
+    td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+</style>
+{% endblock %}

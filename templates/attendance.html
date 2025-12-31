@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Attendance Calculator - CalcHub{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>Attendance Calculator</h1>
+    <div class="calc-container">
+        <div class="input-group">
+            <label>Classes Attended</label>
+            <input type="number" id="attended" placeholder="Enter classes attended">
+        </div>
+        <div class="input-group">
+            <label>Total Classes</label>
+            <input type="number" id="total" placeholder="Enter total classes">
+        </div>
+        <div class="input-group">
+            <label>Target Percentage (%)</label>
+            <input type="number" id="target" value="75" placeholder="Enter target">
+        </div>
+        <button class="btn-primary" onclick="calculateAttendance()">Calculate Attendance</button>
+
+        <div id="result" class="result-box" style="display:none;">
+            <h2>Current Attendance: <span id="percentage"></span>%</h2>
+            <div class="attendance-bar">
+                <div id="attendanceIndicator" class="attendance-fill"></div>
+            </div>
+            <div class="attendance-info">
+                <p class="status" id="status"></p>
+                <p id="classesNeeded"></p>
+                <p id="canMiss"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/pdf-utils.js') }}"></script>
+<script>
+    let currentData = null;
+
+    async function calculateAttendance() {
+        const attended = document.getElementById('attended').value;
+        const total = document.getElementById('total').value;
+        const target = document.getElementById('target').value || 75;
+
+        if (!attended || !total) {
+            alert('Please fill all fields');
+            return;
+        }
+
+        currentData = { attended, total, target };
+
+        const response = await fetch('/api/attendance', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(currentData)
+        });
+
+        const data = await response.json();
+
+        document.getElementById('percentage').textContent = data.percentage;
+        document.getElementById('attendanceIndicator').style.width = data.percentage + '%';
+        document.getElementById('status').textContent = 'Status: ' + data.status;
+
+        if (data.classes_needed > 0) {
+            document.getElementById('classesNeeded').textContent =
+                `You need to attend ${data.classes_needed} more classes to reach ${data.target}%`;
+        } else {
+            document.getElementById('classesNeeded').textContent =
+                `You've reached your target of ${data.target}%!`;
+        }
+
+        if (data.can_miss > 0) {
+            document.getElementById('canMiss').textContent =
+                `You can miss ${data.can_miss} classes and still maintain ${data.target}%`;
+        }
+
+        document.getElementById('result').style.display = 'block';
+
+        addPDFDownloadButton('result', '/api/pdf/attendance', () => currentData, 'Attendance');
+    }
+</script>
+{% endblock %}

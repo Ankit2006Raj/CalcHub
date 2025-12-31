@@ -1,0 +1,202 @@
+{% extends "base.html" %}
+
+{% block title %}Sleep Calculator - CalcHub{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>😴 Sleep Calculator</h1>
+    <div class="calc-container">
+        <div class="input-group">
+            <label>Calculation Type</label>
+            <select id="calcType" onchange="toggleInputs()">
+                <option value="bedtime">When should I go to bed?</option>
+                <option value="waketime">When should I wake up?</option>
+                <option value="sleepdebt">Calculate my sleep debt</option>
+            </select>
+        </div>
+
+        <div id="bedtimeInputs" style="display:block;">
+            <div class="input-group">
+                <label>Wake Up Time</label>
+                <input type="time" id="wakeTime" value="07:00">
+            </div>
+            <button class="btn-primary" onclick="calculateBedtime()">Calculate Bedtime</button>
+        </div>
+
+        <div id="waketimeInputs" style="display:none;">
+            <div class="input-group">
+                <label>Bedtime</label>
+                <input type="time" id="sleepTime" value="23:00">
+            </div>
+            <button class="btn-primary" onclick="calculateWaketime()">Calculate Wake Time</button>
+        </div>
+
+        <div id="sleepdebtInputs" style="display:none;">
+            <p style="margin-bottom: 1rem;">Enter hours slept for the last 7 nights:</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 0.5rem;">
+                <div class="input-group">
+                    <label>Night 1</label>
+                    <input type="number" class="sleep-hours" step="0.5" min="0" max="24" value="7">
+                </div>
+                <div class="input-group">
+                    <label>Night 2</label>
+                    <input type="number" class="sleep-hours" step="0.5" min="0" max="24" value="7">
+                </div>
+                <div class="input-group">
+                    <label>Night 3</label>
+                    <input type="number" class="sleep-hours" step="0.5" min="0" max="24" value="7">
+                </div>
+                <div class="input-group">
+                    <label>Night 4</label>
+                    <input type="number" class="sleep-hours" step="0.5" min="0" max="24" value="7">
+                </div>
+                <div class="input-group">
+                    <label>Night 5</label>
+                    <input type="number" class="sleep-hours" step="0.5" min="0" max="24" value="7">
+                </div>
+                <div class="input-group">
+                    <label>Night 6</label>
+                    <input type="number" class="sleep-hours" step="0.5" min="0" max="24" value="7">
+                </div>
+                <div class="input-group">
+                    <label>Night 7</label>
+                    <input type="number" class="sleep-hours" step="0.5" min="0" max="24" value="7">
+                </div>
+            </div>
+            <button class="btn-primary" onclick="calculateSleepDebt()">Calculate Sleep Debt</button>
+        </div>
+
+        <div id="result" class="result-box" style="display:none;"></div>
+
+        <div class="info-card" style="margin-top: 2rem;">
+            <h3>💡 Sleep Tips</h3>
+            <ul style="text-align: left; padding-left: 1.5rem;">
+                <li>Keep bedroom cool (60-67°F / 15-19°C)</li>
+                <li>Avoid screens 1 hour before bed</li>
+                <li>No caffeine after 2 PM</li>
+                <li>Exercise regularly, but not before bed</li>
+                <li>Keep consistent sleep schedule</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleInputs() {
+        const calcType = document.getElementById('calcType').value;
+        document.getElementById('bedtimeInputs').style.display = calcType === 'bedtime' ? 'block' : 'none';
+        document.getElementById('waketimeInputs').style.display = calcType === 'waketime' ? 'block' : 'none';
+        document.getElementById('sleepdebtInputs').style.display = calcType === 'sleepdebt' ? 'block' : 'none';
+        document.getElementById('result').style.display = 'none';
+    }
+
+    async function calculateBedtime() {
+        const wakeTime = document.getElementById('wakeTime').value;
+        if (!wakeTime) {
+            alert('Please select a wake time');
+            return;
+        }
+
+        const response = await fetch('/api/sleep', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ wake_time: wakeTime, type: 'sleep_times' })
+        });
+
+        const data = await response.json();
+        displayBedtimeResults(data);
+    }
+
+    async function calculateWaketime() {
+        const sleepTime = document.getElementById('sleepTime').value;
+        if (!sleepTime) {
+            alert('Please select a bedtime');
+            return;
+        }
+
+        const response = await fetch('/api/sleep', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ sleep_time: sleepTime, type: 'sleep_times' })
+        });
+
+        const data = await response.json();
+        displayWaketimeResults(data);
+    }
+
+    async function calculateSleepDebt() {
+        const hours = Array.from(document.querySelectorAll('.sleep-hours')).map(input => parseFloat(input.value));
+
+        const response = await fetch('/api/sleep', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ hours_slept: hours, type: 'sleep_debt' })
+        });
+
+        const data = await response.json();
+        displaySleepDebtResults(data);
+    }
+
+    function displayBedtimeResults(data) {
+        let html = `<h2>Bedtime Options for ${data.wake_time} wake up</h2>`;
+        html += `<p style="color: #888; margin-bottom: 1rem;">${data.note}</p>`;
+
+        data.bedtime_options.forEach((option, index) => {
+            const bgColor = index === 0 ? '#667eea' : index === 1 ? '#764ba2' : '#888';
+            html += `
+                <div class="info-card" style="background: ${bgColor}; color: white; margin-bottom: 1rem;">
+                    <h3>${option.bedtime} ${index === 0 ? '⭐ Recommended' : ''}</h3>
+                    <p><strong>${option.cycles} sleep cycles</strong> (${option.sleep_duration_hours} hours)</p>
+                    <p>Sleep Quality: ${option.quality}</p>
+                </div>
+            `;
+        });
+
+        document.getElementById('result').innerHTML = html;
+        document.getElementById('result').style.display = 'block';
+    }
+
+    function displayWaketimeResults(data) {
+        let html = `<h2>Wake Time Options for ${data.sleep_time} bedtime</h2>`;
+        html += `<p style="color: #888; margin-bottom: 1rem;">${data.note}</p>`;
+
+        data.wake_time_options.forEach((option, index) => {
+            const bgColor = index === 1 ? '#667eea' : index === 0 ? '#888' : '#764ba2';
+            html += `
+                <div class="info-card" style="background: ${bgColor}; color: white; margin-bottom: 1rem;">
+                    <h3>${option.wake_time} ${index === 1 ? '⭐ Recommended' : ''}</h3>
+                    <p><strong>${option.cycles} sleep cycles</strong> (${option.sleep_duration_hours} hours)</p>
+                    <p>Sleep Quality: ${option.quality}</p>
+                </div>
+            `;
+        });
+
+        document.getElementById('result').innerHTML = html;
+        document.getElementById('result').style.display = 'block';
+    }
+
+    function displaySleepDebtResults(data) {
+        const statusColor = data.total_sleep_debt_hours <= 0 ? '#2ecc71' :
+            data.total_sleep_debt_hours <= 5 ? '#f39c12' : '#e74c3c';
+
+        let html = `
+            <h2>Sleep Debt Analysis</h2>
+            <div class="info-card" style="background: ${statusColor}; color: white;">
+                <h3>${data.status}</h3>
+                <p><strong>Average Sleep:</strong> ${data.average_sleep_hours} hours/night</p>
+                <p><strong>Total Sleep Debt:</strong> ${data.total_sleep_debt_hours} hours</p>
+                ${data.recovery_nights_needed > 0 ? `<p><strong>Recovery Needed:</strong> ${data.recovery_nights_needed} nights</p>` : ''}
+            </div>
+            <div class="info-card">
+                <h3>💡 Recommendations</h3>
+                <ul style="text-align: left; padding-left: 1.5rem;">
+                    ${data.recommendations.map(rec => `<li>${rec}</li>`).join('')}
+                </ul>
+            </div>
+        `;
+
+        document.getElementById('result').innerHTML = html;
+        document.getElementById('result').style.display = 'block';
+    }
+</script>
+{% endblock %}

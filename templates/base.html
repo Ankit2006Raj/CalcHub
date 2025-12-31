@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="All-in-one calculator app with AI-powered recommendations, data visualizations, and offline support">
+    <meta name="theme-color" content="#667eea">
+    <title>{% block title %}CalcHub - All-in-One Smart Calculators{% endblock %}</title>
+
+    <!-- PWA Support -->
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CalcHub">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/navbar.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/animations.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/command-palette.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/footer.css') }}">
+    {% block extra_css %}{% endblock %}
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+
+<body class="page-transition">
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="logo">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">CalcHub</span>
+            </a>
+
+            <button class="mobile-menu-toggle" aria-label="Toggle menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+
+            <div class="nav-links">
+                <a href="/" class="nav-link">
+                    <span class="nav-icon">🏠</span>
+                    <span>Home</span>
+                </a>
+
+                <div class="nav-dropdown">
+                    <button class="nav-link dropdown-toggle">
+                        <span class="nav-icon">💪</span>
+                        <span>Health & Fitness</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="/bmi" class="dropdown-item">BMI Calculator</a>
+                        <a href="/bmr" class="dropdown-item">BMR Calculator</a>
+                        <a href="/calorie" class="dropdown-item">Calorie Calculator</a>
+                        <a href="/calorie-burn" class="dropdown-item">Calorie Burn</a>
+                        <a href="/water-intake" class="dropdown-item">Water Intake</a>
+                        <a href="/macros" class="dropdown-item">Macros Calculator</a>
+                        <a href="/sleep" class="dropdown-item">Sleep Calculator</a>
+                        <a href="/pregnancy" class="dropdown-item">Pregnancy Calculator</a>
+                    </div>
+                </div>
+
+                <div class="nav-dropdown">
+                    <button class="nav-link dropdown-toggle">
+                        <span class="nav-icon">💰</span>
+                        <span>Finance</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="/loan" class="dropdown-item">Loan Calculator</a>
+                        <a href="/mortgage" class="dropdown-item">Mortgage Calculator</a>
+                        <a href="/compound-interest" class="dropdown-item">Compound Interest</a>
+                        <a href="/discount" class="dropdown-item">Discount Calculator</a>
+                        <a href="/percentage" class="dropdown-item">Percentage Calculator</a>
+                        <a href="/currency-converter" class="dropdown-item">Currency Converter</a>
+                    </div>
+                </div>
+
+                <div class="nav-dropdown">
+                    <button class="nav-link dropdown-toggle">
+                        <span class="nav-icon">🎓</span>
+                        <span>Education</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="/gpa" class="dropdown-item">GPA Calculator</a>
+                        <a href="/grade" class="dropdown-item">Grade Calculator</a>
+                        <a href="/attendance" class="dropdown-item">Attendance Calculator</a>
+                    </div>
+                </div>
+
+                <div class="nav-dropdown">
+                    <button class="nav-link dropdown-toggle">
+                        <span class="nav-icon">🔧</span>
+                        <span>Tools</span>
+                        <span class="dropdown-arrow">▼</span>
+                    </button>
+                    <div class="dropdown-menu">
+                        <a href="/age" class="dropdown-item">Age Calculator</a>
+                        <a href="/math" class="dropdown-item">Math Calculator</a>
+                        <a href="/unit-converter" class="dropdown-item">Unit Converter</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="modern-footer">
+        <!-- Animated Background Elements -->
+        <div class="footer-bg-animation">
+            <div class="floating-shape shape-1"></div>
+            <div class="floating-shape shape-2"></div>
+            <div class="floating-shape shape-3"></div>
+            <div class="floating-shape shape-4"></div>
+        </div>
+
+        <div class="footer-container">
+            <!-- Main Footer Content -->
+            <div class="footer-content">
+                <div class="footer-section footer-brand">
+                    <div class="brand-wrapper">
+                        <h3 class="footer-logo">
+                            <span class="logo-icon">⚡</span>
+                            <span class="logo-text">CalcHub</span>
+                        </h3>
+                        <div class="brand-badge">Smart Calculators</div>
+                    </div>
+                    <p class="footer-tagline">
+                        <span class="tagline-icon">✨</span>
+                        Your all-in-one smart calculator suite for everyday calculations. Fast, accurate, and always
+                        free.
+                    </p>
+                    <div class="footer-stats">
+                        <div class="stat-item">
+                            <span class="stat-number">20+</span>
+                            <span class="stat-label">Calculators</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">100%</span>
+                            <span class="stat-label">Free</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-number">24/7</span>
+                            <span class="stat-label">Available</span>
+                        </div>
+                    </div>
+                    <p class="footer-hint">
+                        <span class="hint-icon">💡</span>
+                        Quick tip: Press <kbd>Ctrl</kbd> + <kbd>K</kbd> for instant search
+                    </p>
+                </div>
+
+                <div class="footer-section footer-links">
+                    <h4>
+                        <span class="section-icon">🔗</span>
+                        Quick Links
+                    </h4>
+                    <ul>
+                        <li><a href="/"><span class="link-arrow">→</span> Home</a></li>
+                        <li><a href="/bmi"><span class="link-arrow">→</span> BMI Calculator</a></li>
+                        <li><a href="/loan"><span class="link-arrow">→</span> Loan Calculator</a></li>
+                        <li><a href="/gpa"><span class="link-arrow">→</span> GPA Calculator</a></li>
+                        <li><a href="/calorie"><span class="link-arrow">→</span> Calorie Calculator</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section footer-calculators">
+                    <h4>
+                        <span class="section-icon">🧮</span>
+                        Popular Tools
+                    </h4>
+                    <ul>
+                        <li><a href="/percentage"><span class="link-arrow">→</span> Percentage</a></li>
+                        <li><a href="/compound-interest"><span class="link-arrow">→</span> Compound Interest</a></li>
+                        <li><a href="/math"><span class="link-arrow">→</span> Math Calculator</a></li>
+                        <li><a href="/attendance"><span class="link-arrow">→</span> Attendance</a></li>
+                        <li><a href="/pregnancy"><span class="link-arrow">→</span> Pregnancy</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-section footer-connect">
+                    <h4>
+                        <span class="section-icon">🌟</span>
+                        Let's Connect
+                    </h4>
+                    <p class="connect-text">Follow me on social media and stay updated!</p>
+                    <div class="social-links">
+                        <a href="https://github.com/Ankit2006Raj" target="_blank" rel="noopener noreferrer"
+                            class="social-link github-link" title="Follow on GitHub">
+                            <div class="social-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z" />
+                                </svg>
+                            </div>
+                            <div class="social-content">
+                                <span class="social-name">GitHub</span>
+                                <span class="social-handle">@Ankit2006Raj</span>
+                            </div>
+                        </a>
+                        <a href="https://www.linkedin.com/in/ankit-raj-226a36309" target="_blank"
+                            rel="noopener noreferrer" class="social-link linkedin-link" title="Connect on LinkedIn">
+                            <div class="social-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" />
+                                </svg>
+                            </div>
+                            <div class="social-content">
+                                <span class="social-name">LinkedIn</span>
+                                <span class="social-handle">Ankit Raj</span>
+                            </div>
+                        </a>
+                        <a href="mailto:ankit9905163014@gmail.com" class="social-link email-link" title="Send an Email">
+                            <div class="social-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                                    <path
+                                        d="M0 3v18h24v-18h-24zm6.623 7.929l-4.623 5.712v-9.458l4.623 3.746zm-4.141-5.929h19.035l-9.517 7.713-9.518-7.713zm5.694 7.188l3.824 3.099 3.83-3.104 5.612 6.817h-18.779l5.513-6.812zm9.208-1.264l4.616-3.741v9.348l-4.616-5.607z" />
+                                </svg>
+                            </div>
+                            <div class="social-content">
+                                <span class="social-name">Email</span>
+                                <span class="social-handle">Get in Touch</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Divider with decoration -->
+            <div class="footer-divider">
+                <div class="divider-line"></div>
+                <div class="divider-icon">⚡</div>
+                <div class="divider-line"></div>
+            </div>
+
+            <!-- Footer Bottom -->
+            <div class="footer-bottom">
+                <div class="footer-bottom-content">
+                    <p class="copyright">
+                        <span class="copyright-icon">©</span>
+                        2025 CalcHub. Develeoped by
+                        by <a href="https://github.com/Ankit2006Raj" target="_blank" rel="noopener noreferrer"
+                            class="creator-link">Ankit Raj</a>
+                    </p>
+                    <div class="footer-badges">
+                        <span class="badge">Made in India 🇮🇳</span>
+                        <span class="badge">Open Source</span>
+                        <span class="badge">Always Free</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Core Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/command-palette.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+
+    <!-- PWA Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/sw.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed'));
+            });
+        }
+
+        // Install prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            showInstallPromotion();
+        });
+
+        function showInstallPromotion() {
+            const installBanner = document.createElement('div');
+            installBanner.className = 'install-banner';
+            installBanner.innerHTML = `
+                <div class="install-content">
+                    <span>📱 Install CalcHub for offline access!</span>
+                    <button onclick="installApp()" class="install-btn">Install</button>
+                    <button onclick="this.parentElement.parentElement.remove()" class="dismiss-btn">×</button>
+                </div>
+            `;
+            document.body.appendChild(installBanner);
+        }
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    deferredPrompt = null;
+                    document.querySelector('.install-banner')?.remove();
+                });
+            }
+        }
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+
+</html>

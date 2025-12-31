@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+
+{% block title %}Mortgage Calculator - CalcHub{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>Mortgage Calculator</h1>
+    <div class="calc-container">
+        <div class="input-group">
+            <label>Home Price ($)</label>
+            <input type="number" id="home_price" placeholder="Enter home price">
+        </div>
+        <div class="input-group">
+            <label>Down Payment ($)</label>
+            <input type="number" id="down_payment" placeholder="Enter down payment">
+        </div>
+        <div class="input-group">
+            <label>Interest Rate (%)</label>
+            <input type="number" step="0.1" id="interest_rate" placeholder="Enter interest rate">
+        </div>
+        <div class="input-group">
+            <label>Loan Term (years)</label>
+            <input type="number" id="loan_term" placeholder="Enter loan term">
+        </div>
+
+        <div class="advanced-options" style="margin-top: 20px;">
+            <h3>Additional Costs (Optional)</h3>
+            <div class="input-group">
+                <label>Annual Property Tax ($)</label>
+                <input type="number" id="property_tax" placeholder="0" value="0">
+            </div>
+            <div class="input-group">
+                <label>Annual Home Insurance ($)</label>
+                <input type="number" id="home_insurance" placeholder="0" value="0">
+            </div>
+            <div class="input-group">
+                <label>Monthly PMI ($)</label>
+                <input type="number" id="pmi" placeholder="0" value="0">
+            </div>
+            <div class="input-group">
+                <label>Monthly HOA Fees ($)</label>
+                <input type="number" id="hoa_fees" placeholder="0" value="0">
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="calculateMortgage()">Calculate Mortgage</button>
+
+        <div id="result" class="result-box" style="display:none;">
+            <h2>Mortgage Summary</h2>
+            <div class="loan-results">
+                <div class="loan-item">
+                    <h3>Monthly Payment (P&I)</h3>
+                    <p id="monthly_pi" class="highlight"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Total Monthly Payment</h3>
+                    <p id="total_monthly" class="highlight"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Loan Amount</h3>
+                    <p id="loan_amount"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Down Payment</h3>
+                    <p id="down_percent"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Total Interest</h3>
+                    <p id="total_interest"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Total Cost</h3>
+                    <p id="total_cost"></p>
+                </div>
+            </div>
+
+            <div id="breakdown" style="margin-top: 20px;">
+                <h3>Monthly Payment Breakdown</h3>
+                <p>Principal & Interest: $<span id="pi_amount"></span></p>
+                <p>Property Tax: $<span id="tax_amount"></span></p>
+                <p>Home Insurance: $<span id="insurance_amount"></span></p>
+                <p>PMI: $<span id="pmi_amount"></span></p>
+                <p>HOA Fees: $<span id="hoa_amount"></span></p>
+            </div>
+
+            <div style="margin-top: 20px;">
+                <p><strong>Recommended Annual Income:</strong> $<span id="recommended_income"></span></p>
+                <p><small>Based on 28% debt-to-income ratio</small></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentData = null;
+
+    async function calculateMortgage() {
+        const home_price = document.getElementById('home_price').value;
+        const down_payment = document.getElementById('down_payment').value;
+        const interest_rate = document.getElementById('interest_rate').value;
+        const loan_term = document.getElementById('loan_term').value;
+        const property_tax = document.getElementById('property_tax').value || 0;
+        const home_insurance = document.getElementById('home_insurance').value || 0;
+        const pmi = document.getElementById('pmi').value || 0;
+        const hoa_fees = document.getElementById('hoa_fees').value || 0;
+
+        if (!home_price || !down_payment || !interest_rate || !loan_term) {
+            alert('Please fill all required fields');
+            return;
+        }
+
+        currentData = { home_price, down_payment, interest_rate, loan_term, property_tax, home_insurance, pmi, hoa_fees };
+
+        const response = await fetch('/api/mortgage', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(currentData)
+        });
+
+        const data = await response.json();
+
+        document.getElementById('monthly_pi').textContent = '$' + data.monthly_principal_interest.toFixed(2);
+        document.getElementById('total_monthly').textContent = '$' + data.total_monthly_payment.toFixed(2);
+        document.getElementById('loan_amount').textContent = '$' + data.loan_amount.toFixed(2);
+        document.getElementById('down_percent').textContent = data.down_payment_percent.toFixed(1) + '% ($' + data.down_payment.toFixed(2) + ')';
+        document.getElementById('total_interest').textContent = '$' + data.total_interest.toFixed(2);
+        document.getElementById('total_cost').textContent = '$' + data.total_cost.toFixed(2);
+
+        document.getElementById('pi_amount').textContent = data.monthly_principal_interest.toFixed(2);
+        document.getElementById('tax_amount').textContent = data.monthly_property_tax.toFixed(2);
+        document.getElementById('insurance_amount').textContent = data.monthly_insurance.toFixed(2);
+        document.getElementById('pmi_amount').textContent = data.monthly_pmi.toFixed(2);
+        document.getElementById('hoa_amount').textContent = data.monthly_hoa.toFixed(2);
+
+        document.getElementById('recommended_income').textContent = (data.recommended_income * 12).toFixed(2);
+
+        document.getElementById('result').style.display = 'block';
+    }
+</script>
+{% endblock %}
