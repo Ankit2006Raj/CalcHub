@@ -186,7 +186,7 @@ CalcHub provides RESTful API endpoints for programmatic access to all calculator
 - `GET /api/currency-converter/currencies` – Available currencies list
 - `POST /api/unit-converter` – Unit conversion
 - `GET /api/unit-converter/categories` – Conversion categories
-- `GET /api/unit-converter/units/<category>` – Units by category
+
 
 ## 🤝 Contributing
 
