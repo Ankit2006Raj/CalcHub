@@ -426,10 +426,13 @@ function initScrollProgress() {
 }
 
 // Initialize on load
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initScrollProgress);
-} else {
+function initApp() {
     initScrollProgress();
+}
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
 }
 
 // Add smooth reveal for result boxes
@@ -460,11 +463,6 @@ function copyToClipboard(text, button) {
     });
 }
 
-// Add theme toggle (optional enhancement)
-function initThemeToggle() {
-    const theme = localStorage.getItem('theme') || 'light';
-    document.documentElement.setAttribute('data-theme', theme);
-}
 
 // Performance: Debounce function for search
 function debounce(func, wait) {

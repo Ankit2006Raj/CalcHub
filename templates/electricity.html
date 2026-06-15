@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Electricity Bill Calculator - CalcHub{% endblock %}
+
+{% block meta %}
+<meta name="description" content="Calculate your Electricity Bill based on units consumed, flat rates, and fixed charges.">
+<meta property="og:title" content="Electricity Bill Calculator - CalcHub">
+{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>Electricity Bill Calculator</h1>
+    <div class="calc-container">
+        <div class="input-group">
+            <label>Units Consumed (kWh)</label>
+            <input type="number" id="elec-units" placeholder="e.g. 250">
+        </div>
+        <div class="input-group">
+            <label>Rate per Unit (₹)</label>
+            <input type="number" step="0.1" id="elec-rate" placeholder="e.g. 6.5">
+        </div>
+        <div class="input-group">
+            <label>Fixed Charges (₹)</label>
+            <input type="number" step="0.1" id="elec-fixed" value="0">
+        </div>
+        <div class="input-group">
+            <label>Tax/Duty Percentage (%)</label>
+            <input type="number" step="0.1" id="elec-tax" value="0">
+        </div>
+        <button class="btn-primary" onclick="calculateElectricity()">Calculate Bill</button>
+
+        <div id="result" class="result-box" style="display:none;">
+            <h2>Bill Breakdown</h2>
+            <div class="loan-results">
+                <div class="loan-item">
+                    <h3>Energy Charge</h3>
+                    <p id="elec-energy-charge"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Fixed & Taxes</h3>
+                    <p id="elec-extra-charge"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Total Bill Amount</h3>
+                    <p id="elec-total" class="highlight"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function calculateElectricity() {
+    const units = parseFloat(document.getElementById('elec-units').value);
+    const rate = parseFloat(document.getElementById('elec-rate').value);
+    const fixed = parseFloat(document.getElementById('elec-fixed').value) || 0;
+    const tax = parseFloat(document.getElementById('elec-tax').value) || 0;
+
+    if (isNaN(units) || isNaN(rate)) {
+        alert("Please enter units consumed and rate per unit");
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/electricity-bill', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                units: units,
+                rate_per_unit: rate,
+                fixed_charge: fixed,
+                tax_percentage: tax
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        document.getElementById('result').style.display = 'block';
+        document.getElementById('elec-energy-charge').textContent = "₹" + data.energy_charge.toFixed(2);
+        
+        const extra = data.fixed_charge + data.tax_amount;
+        document.getElementById('elec-extra-charge').textContent = "₹" + extra.toFixed(2);
+        
+        document.getElementById('elec-total').textContent = "₹" + data.total_bill.toFixed(2);
+        
+    } catch (err) {
+        console.error(err);
+        alert('An error occurred during calculation');
+    }
+}
+</script>
+{% endblock %}

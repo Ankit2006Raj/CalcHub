@@ -38,8 +38,12 @@
 
 /* Dropdown Item Stagger Animation */
 .dropdown-item {
+    opacity: 1;
+}
+
+.nav-dropdown:hover .dropdown-item,
+.nav-dropdown.active .dropdown-item {
     animation: fadeInLeft 0.3s ease forwards;
-    opacity: 0;
 }
 
 .nav-dropdown:hover .dropdown-item:nth-child(1) {

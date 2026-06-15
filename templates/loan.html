@@ -2,6 +2,12 @@
 
 {% block title %}Loan EMI Calculator - CalcHub{% endblock %}
 
+{% block meta %}
+<meta name="description" content="Calculate your monthly Loan EMI, total interest, and payment breakdown instantly. Plan your finances with our free Loan EMI Calculator.">
+<meta property="og:title" content="Free Loan EMI Calculator - Plan Your Finances">
+<meta property="og:description" content="Calculate your monthly Loan EMI, total interest, and payment breakdown instantly. Plan your finances with our free Loan EMI Calculator.">
+{% endblock %}
+
 {% block content %}
 <div class="calculator-page">
     <h1>Loan EMI Calculator</h1>
@@ -36,6 +42,33 @@
                     <p id="total"></p>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="seo-content" style="margin-top: 3rem; text-align: left; border-top: 1px solid rgba(102, 126, 234, 0.2); padding-top: 2rem;">
+        <h2>What is Loan EMI?</h2>
+        <p style="margin-top: 0.5rem; line-height: 1.6;">Equated Monthly Installment (EMI) is a fixed payment amount made by a borrower to a lender at a specified date each calendar month. EMIs are used to pay off both interest and principal each month so that over a specified number of years, the loan is paid off in full.</p>
+        
+        <h3 style="margin-top: 1.5rem;">EMI Formula</h3>
+        <p style="margin-top: 0.5rem; line-height: 1.6;">The standard mathematical formula to calculate EMI is:</p>
+        <div style="background: rgba(102, 126, 234, 0.1); padding: 1rem; border-radius: 10px; text-align: center; font-family: monospace; font-size: 1.2rem; margin: 1rem 0; color: #667eea;">
+            E = P × r × (1 + r)ⁿ / ((1 + r)ⁿ - 1)
+        </div>
+        <ul style="margin-left: 2rem; line-height: 1.6;">
+            <li><strong>E</strong> is EMI</li>
+            <li><strong>P</strong> is Principal Loan Amount</li>
+            <li><strong>r</strong> is rate of interest calculated on monthly basis (i.e., r = Rate of Annual interest/12/100)</li>
+            <li><strong>n</strong> is loan term / tenure / duration in number of months</li>
+        </ul>
+
+        <h3 style="margin-top: 1.5rem;">Frequently Asked Questions</h3>
+        <div class="faq-item" style="margin-top: 1rem;">
+            <strong>Q: How does the loan tenure affect my EMI?</strong>
+            <p style="margin-top: 0.3rem; margin-bottom: 1rem; line-height: 1.6;">A: A longer loan tenure reduces your monthly EMI amount, making it more affordable, but it significantly increases the total interest you will pay over the life of the loan.</p>
+        </div>
+        <div class="faq-item">
+            <strong>Q: Can I reduce my EMI during the loan term?</strong>
+            <p style="margin-top: 0.3rem; line-height: 1.6;">A: Yes, you can reduce your EMI by making part-prepayments towards the principal amount, or by refinancing the loan at a lower interest rate.</p>
         </div>
     </div>
 </div>

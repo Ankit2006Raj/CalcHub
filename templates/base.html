@@ -8,6 +8,7 @@
         content="All-in-one calculator app with AI-powered recommendations, data visualizations, and offline support">
     <meta name="theme-color" content="#667eea">
     <title>{% block title %}CalcHub - All-in-One Smart Calculators{% endblock %}</title>
+    {% block meta %}{% endblock %}
 
     <!-- PWA Support -->
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
@@ -27,7 +28,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 </head>
 
-<body class="page-transition">
+<body class="page-transition dark-mode">
     <nav class="navbar">
         <div class="nav-container">
             <a href="/" class="logo">
@@ -46,6 +47,8 @@
                     <span class="nav-icon">🏠</span>
                     <span>Home</span>
                 </a>
+                
+
 
                 <div class="nav-dropdown">
                     <button class="nav-link dropdown-toggle">
@@ -74,6 +77,10 @@
                     <div class="dropdown-menu">
                         <a href="/loan" class="dropdown-item">Loan Calculator</a>
                         <a href="/mortgage" class="dropdown-item">Mortgage Calculator</a>
+                        <a href="/credit-card-emi" class="dropdown-item">Credit Card EMI</a>
+                        <a href="/fd-calculator" class="dropdown-item">FD Calculator</a>
+                        <a href="/electricity-bill" class="dropdown-item">Electricity Bill</a>
+                        <a href="/gst-calculator" class="dropdown-item">GST Calculator</a>
                         <a href="/compound-interest" class="dropdown-item">Compound Interest</a>
                         <a href="/discount" class="dropdown-item">Discount Calculator</a>
                         <a href="/percentage" class="dropdown-item">Percentage Calculator</a>
@@ -106,6 +113,7 @@
                         <a href="/unit-converter" class="dropdown-item">Unit Converter</a>
                     </div>
                 </div>
+
             </div>
         </div>
     </nav>
@@ -308,6 +316,7 @@
             }
         }
     </script>
+
 
     {% block extra_js %}{% endblock %}
 </body>

@@ -20,6 +20,10 @@ from calculators.currency_converter import convert_currency, get_all_currencies 
 from calculators.unit_converter import convert_unit, get_all_units, get_all_categories
 from calculators.macros_calculator import calculate_macros
 from calculators.sleep_calculator import calculate_sleep_times, calculate_sleep_debt, get_sleep_tips
+from calculators.credit_card_emi_calculator import calculate_cc_emi
+from calculators.fd_calculator import calculate_fd
+from calculators.electricity_bill_calculator import calculate_electricity_bill
+from calculators.gst_calculator import calculate_gst
 from utils.pdf_generator import PDFGenerator
 from utils.ai_service import AIService
 from utils.history_manager import HistoryManager
@@ -46,6 +50,8 @@ def get_user_id():
 @app.route('/')
 def home():
     return render_template('index.html')
+
+
 
 @app.route('/bmi')
 def bmi():
@@ -128,6 +134,22 @@ def macros():
 @app.route('/sleep')
 def sleep():
     return render_template('sleep.html')
+
+@app.route('/credit-card-emi')
+def credit_card_emi():
+    return render_template('credit_card_emi.html')
+
+@app.route('/fd-calculator')
+def fd_calculator():
+    return render_template('fd.html')
+
+@app.route('/electricity-bill')
+def electricity_bill():
+    return render_template('electricity.html')
+
+@app.route('/gst-calculator')
+def gst_calculator():
+    return render_template('gst.html')
 
 # API Routes
 @app.route('/api/bmi', methods=['POST'])
@@ -357,9 +379,63 @@ def api_sleep():
     return jsonify(result)
 
 @app.route('/api/sleep/tips', methods=['GET'])
-def api_sleep_tips():
-    tips = get_sleep_tips()
-    return jsonify({'tips': tips})
+def get_sleep_tips_api():
+    try:
+        return jsonify(get_sleep_tips())
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/api/credit-card-emi', methods=['POST'])
+def api_credit_card_emi():
+    try:
+        data = request.json
+        amount = float(data.get('amount', 0))
+        rate = float(data.get('rate', 0))
+        months = int(data.get('months', 0))
+        processing_fee = float(data.get('processing_fee', 1.0))
+        gst_rate = float(data.get('gst_rate', 18.0))
+        result = calculate_cc_emi(amount, rate, months, processing_fee, gst_rate)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/api/fd-calculator', methods=['POST'])
+def api_fd_calculator():
+    try:
+        data = request.json
+        principal = float(data.get('principal', 0))
+        rate = float(data.get('rate', 0))
+        years = float(data.get('years', 0))
+        compounding = data.get('compounding_frequency', 'quarterly')
+        result = calculate_fd(principal, rate, years, compounding)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/api/electricity-bill', methods=['POST'])
+def api_electricity_bill():
+    try:
+        data = request.json
+        units = float(data.get('units', 0))
+        rate = float(data.get('rate_per_unit', 0))
+        fixed = float(data.get('fixed_charge', 0))
+        tax = float(data.get('tax_percentage', 0))
+        result = calculate_electricity_bill(units, rate, fixed, tax)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/api/gst-calculator', methods=['POST'])
+def api_gst_calculator():
+    try:
+        data = request.json
+        amount = float(data.get('amount', 0))
+        rate = float(data.get('gst_rate', 0))
+        mode = data.get('mode', 'add')
+        result = calculate_gst(amount, rate, mode)
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400
 
 # PDF Download Routes
 @app.route('/api/pdf/bmi', methods=['POST'])

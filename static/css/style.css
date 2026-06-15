@@ -438,9 +438,15 @@ main {
 
 .calculator-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    grid-template-columns: repeat(4, 1fr);
     gap: 2rem;
     margin-top: 3rem;
+}
+
+@media (max-width: 1024px) {
+    .calculator-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
 }
 
 .calc-card {
@@ -605,15 +611,56 @@ main {
     }
 }
 
+.calculator-page {
+    position: relative;
+    padding-top: 3rem;
+    padding-bottom: 5rem;
+    background: #f8fafc; /* Ultra clean off-white background */
+}
+
+body.dark-mode .calculator-page {
+    background: #0f172a;
+}
+
 .calculator-page h1 {
     text-align: center;
-    color: #667eea;
-    margin-bottom: 2rem;
+    color: #0f172a;
+    margin-bottom: 2.5rem;
+    font-size: 2.8rem;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+body.dark-mode .calculator-page h1 {
+    color: #f8fafc;
 }
 
 .calc-container {
     max-width: 600px;
     margin: 0 auto;
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    padding: 3rem;
+    border-radius: 16px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+body.dark-mode .calc-container {
+    background: #1e293b;
+    border-color: #334155;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.seo-content {
+    max-width: 760px;
+    margin: 4rem auto 0;
+    background: transparent;
+    padding: 0 1.5rem;
+    color: #475569;
+}
+
+body.dark-mode .seo-content {
+    color: #94a3b8;
 }
 
 .input-group {
@@ -2607,21 +2654,375 @@ main {
     }
 }
 
-/* Dark Mode Support (Optional) */
-@media (prefers-color-scheme: dark) {
-    [data-theme="auto"] body {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    }
+/* Comprehensive Dark Mode Support */
+body.dark-mode {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: #e0e0e0;
+}
 
-    [data-theme="auto"] .calculator-page {
-        background: #2a2a3e;
-        color: #e0e0e0;
-    }
+body.dark-mode .navbar {
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.98) 0%, rgba(22, 33, 62, 0.98) 100%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
 
-    [data-theme="auto"] .input-group input,
-    [data-theme="auto"] .input-group select {
-        background: #1a1a2e;
-        color: #e0e0e0;
-        border-color: #3a3a4e;
-    }
+body.dark-mode .nav-link,
+body.dark-mode .logo-text {
+    color: #e0e0e0;
+}
+
+body.dark-mode .nav-link:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: #667eea;
+}
+
+body.dark-mode .dropdown-menu {
+    background: #1a1a2e;
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark-mode .dropdown-item {
+    color: #e0e0e0;
+}
+
+body.dark-mode .dropdown-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+body.dark-mode .calculator-page,
+body.dark-mode .calc-card {
+    background: #2a2a3e;
+    color: #e0e0e0;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+}
+
+body.dark-mode .calc-card p {
+    color: #b0b0b0;
+}
+
+body.dark-mode .input-group label {
+    color: #e0e0e0;
+}
+
+body.dark-mode .input-group input,
+body.dark-mode .input-group select {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    border-color: #3a3a4e;
+}
+
+body.dark-mode .input-group input:focus,
+body.dark-mode .input-group select:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+}
+
+body.dark-mode .search-container input {
+    background-color: #2a2a3e;
+    color: #e0e0e0;
+    border: 1px solid #3a3a4e;
+}
+
+body.dark-mode .btn-secondary {
+    background: #3a3a4e;
+    color: #e0e0e0;
+}
+
+/* Base styles for dark mode toggle button */
+.theme-toggle {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 1.2rem;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #667eea;
+}
+
+.theme-toggle:hover {
+    background: rgba(102, 126, 234, 0.1);
+}
+
+/* =========================================
+   NEW HERO REDESIGN (UI8 BIG SUR STYLE)
+   ========================================= */
+
+.new-hero {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0rem 2rem 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    text-align: left;
+    position: relative;
+    overflow: visible;
+}
+
+.new-hero::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    left: -50vw;
+    right: -50vw;
+    bottom: -100px;
+    background: linear-gradient(135deg, #a8cbfb 0%, #d4e8ff 100%);
+    z-index: -2;
+}
+
+body.dark-mode .new-hero::before {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+.hero-content {
+    flex: 1;
+    max-width: 650px;
+    z-index: 2;
+    align-self: flex-start;
+    margin-top: 0;
+}
+
+.hero-badges {
+    display: flex;
+    justify-content: flex-start;
+    gap: 1rem;
+    margin-bottom: 2rem;
+    align-items: center;
+}
+
+.design-badge {
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.design-badge.brand {
+    background: white;
+    color: #2196f3;
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+}
+
+.badge-dot {
+    background: #2196f3;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+}
+
+.badge-version {
+    background: #2196f3;
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 12px;
+}
+
+.design-badge.freebie {
+    background: #4facfe;
+    color: white;
+    box-shadow: 0 4px 15px rgba(79, 172, 254, 0.3);
+}
+
+.new-hero h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #1a1a2e;
+    margin-bottom: 2rem;
+    text-shadow: none;
+    animation: fadeInLeft 0.8s ease-out;
+}
+
+body.dark-mode .new-hero h1 {
+    color: white;
+}
+
+body.dark-mode .hero-subtitle {
+    color: #a0aec0 !important;
+}
+
+.new-hero .search-container {
+    margin: 0;
+    animation: fadeInLeft 0.8s ease-out 0.2s both;
+}
+
+/* Visual Side */
+.hero-visual {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 500px;
+}
+
+.bg-circle {
+    position: absolute;
+    width: 400px;
+    height: 400px;
+    background: #2196f3;
+    border-radius: 50%;
+    z-index: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.mockups {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    transform: scale(0.85);
+    transform-origin: center right;
+}
+
+.calculator-mockup {
+    position: absolute;
+    width: 280px;
+    height: 580px;
+    border-radius: 35px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.15);
+    transition: transform 0.3s ease;
+}
+
+.light-mockup {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    top: 0;
+    left: 10%;
+    z-index: 2;
+}
+
+.dark-mockup {
+    background: #1e1e24;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 3;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+}
+
+.mockup-screen {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+    padding-bottom: 20px;
+}
+
+.mockup-screen .history {
+    font-size: 1rem;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+.mockup-screen .result {
+    font-size: 2.5rem;
+    font-weight: 500;
+}
+
+.light-mockup .result { color: #111; }
+.dark-mockup .result { color: #fff; }
+
+.mockup-keypad {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 12px;
+    grid-auto-rows: 50px;
+}
+
+.key {
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.light-mockup .key { background: white; color: #333; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+.dark-mockup .key { background: #2a2a32; color: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
+
+.light-mockup .key.secondary { background: #f0f4f8; color: #888; font-size: 1rem; }
+.dark-mockup .key.secondary { background: #222; color: #888; font-size: 1rem; }
+
+.light-mockup .key.action { background: #eef2ff; color: #667eea; }
+.dark-mockup .key.action { background: #2d3748; color: #667eea; }
+
+.light-mockup .key.operator { background: #e0f2fe; color: #0284c7; }
+.dark-mockup .key.operator { background: #0c4a6e; color: #38bdf8; }
+
+.key.equal { background: #2196f3 !important; color: white !important; }
+
+.span-2-row { grid-row: span 2; }
+.span-2-col { grid-column: span 2; width: 100%; justify-content: flex-start; padding-left: 20px; }
+
+/* Floating Elements */
+.floating-tile {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: rgba(255,255,255,0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #888;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    z-index: 4;
+}
+
+.tile-1 { top: -20px; left: 20%; transform: rotate(-15deg); animation: float 4s ease-in-out infinite; }
+.tile-2 { bottom: -20px; left: 10%; transform: rotate(15deg); animation: float 5s ease-in-out infinite reverse; }
+
+.floating-dot {
+    position: absolute;
+    background: #4facfe;
+    border-radius: 50%;
+    z-index: 4;
+}
+.dot-1 { width: 15px; height: 15px; top: 10%; left: 0; animation: float 3s infinite; }
+.dot-2 { width: 20px; height: 20px; right: -10%; bottom: 20%; animation: float 6s infinite reverse; }
+
+@keyframes float {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-15px) rotate(5deg); }
+}
+
+@media (max-width: 1024px) {
+    .new-hero { flex-direction: column; text-align: center; padding: 3rem 1rem; min-height: auto; }
+    .hero-content { margin-bottom: 4rem; }
+    .hero-badges { justify-content: center; }
+    .new-hero .search-container { margin: 0 auto; }
+    .hero-visual { width: 100%; height: 500px; }
+    .calculator-mockup { transform: scale(0.8); transform-origin: top; left: 50%; top: 0; }
+}
+
+@media (max-width: 768px) {
+    .new-hero h1 { font-size: 2.5rem; }
+    .calculator-mockup { transform: scale(0.65); }
+    .bg-circle { width: 300px; height: 300px; }
+    .hero-visual { height: 400px; }
 }

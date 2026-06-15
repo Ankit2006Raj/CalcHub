@@ -1,17 +1,59 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="hero">
-    <h1>All-in-One Smart Calculators</h1>
-    <p>Fast, Accurate & Always Free ✨</p>
-    <div class="search-container">
-        <input type="text" id="searchBar" placeholder="Search calculators... (or press Ctrl+K)"
-            onkeyup="searchCalculators()">
+<div class="hero new-hero">
+    <div class="hero-content">
+        <div class="hero-badges">
+            <span class="design-badge brand" style="background: rgba(102, 126, 234, 0.1); color: #667eea; border: 1px solid rgba(102, 126, 234, 0.2); box-shadow: none;">✨ CalcHub</span>
+        </div>
+        <h1 style="font-size: 3.8rem; line-height: 1.1; margin-bottom: 1.5rem; letter-spacing: -1.5px;">Smart Calculations.<br><span style="background: linear-gradient(90deg, #667eea, #764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Unified Experience.</span></h1>
+        <p class="hero-subtitle" style="font-size: 1.25rem; color: #4a5568; margin-bottom: 2.5rem; line-height: 1.6; max-width: 90%;">20+ Professional Calculators for Finance, Health, Education & Everyday Decisions.</p>
+        <div class="search-container">
+            <input type="text" id="searchBar" placeholder="Search calculators... (or press Ctrl+K)"
+                onkeyup="searchCalculators()">
+        </div>
     </div>
-    <div class="hero-badges">
-        <span class="hero-badge">🚀 20+ Calculators</span>
-        <span class="hero-badge">⚡ Lightning Fast</span>
-        <span class="hero-badge">📱 Mobile Friendly</span>
+    
+    <div class="hero-visual">
+        <div class="bg-circle"></div>
+        <div class="floating-tile tile-1">6</div>
+        <div class="floating-tile tile-2">9</div>
+        <div class="floating-dot dot-1"></div>
+        <div class="floating-dot dot-2"></div>
+        
+        <div class="mockups">
+            <!-- Dark Mockup -->
+            <div class="calculator-mockup dark-mockup">
+                <div class="mockup-screen">
+                    <div class="history">6000/2+3227*2</div>
+                    <div class="result">=12,454</div>
+                </div>
+                <div class="mockup-keypad">
+                    <div class="key secondary">e</div>
+                    <div class="key secondary">μ</div>
+                    <div class="key secondary">sin</div>
+                    <div class="key secondary">deg</div>
+                    <div class="key action">Ac</div>
+                    <div class="key action">⌫</div>
+                    <div class="key operator">/</div>
+                    <div class="key operator">*</div>
+                    <div class="key">7</div>
+                    <div class="key">8</div>
+                    <div class="key">9</div>
+                    <div class="key operator">-</div>
+                    <div class="key">4</div>
+                    <div class="key">5</div>
+                    <div class="key">6</div>
+                    <div class="key operator">+</div>
+                    <div class="key">1</div>
+                    <div class="key">2</div>
+                    <div class="key">3</div>
+                    <div class="key operator equal span-2-row">=</div>
+                    <div class="key span-2-col">0</div>
+                    <div class="key">.</div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 
@@ -134,6 +176,30 @@
         <h3>😴 Sleep Calculator</h3>
         <p>Calculate optimal sleep times</p>
         <a href="/sleep" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-9" data-name="credit card emi interest processing fee">
+        <h3>💳 Credit Card EMI</h3>
+        <p>Compare EMI vs Upfront</p>
+        <a href="/credit-card-emi" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-10" data-name="fixed deposit fd interest maturity">
+        <h3>🏦 FD Calculator</h3>
+        <p>Calculate deposit maturity</p>
+        <a href="/fd-calculator" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-11" data-name="electricity bill energy units rate">
+        <h3>⚡ Electricity Bill</h3>
+        <p>Calculate monthly power bill</p>
+        <a href="/electricity-bill" class="btn">Open Calculator</a>
+    </div>
+
+    <div class="calc-card gradient-12" data-name="gst tax rate inclusive exclusive">
+        <h3>📊 GST Calculator</h3>
+        <p>Add or remove GST tax</p>
+        <a href="/gst-calculator" class="btn">Open Calculator</a>
     </div>
 </div>
 {% endblock %}

@@ -2,6 +2,12 @@
 
 {% block title %}Calorie Calculator - CalcHub{% endblock %}
 
+{% block meta %}
+<meta name="description" content="Calculate your daily calorie needs for weight loss, maintenance, or weight gain based on your activity level and body metrics.">
+<meta property="og:title" content="Daily Calorie Calculator - Reach Your Fitness Goals">
+<meta property="og:description" content="Calculate your daily calorie needs for weight loss, maintenance, or weight gain based on your activity level and body metrics.">
+{% endblock %}
+
 {% block content %}
 <div class="calculator-page">
     <h1>Calorie Calculator</h1>
@@ -63,6 +69,29 @@
                     <li>Improved nutrition awareness</li>
                 </ul>
             </div>
+        </div>
+    </div>
+
+    <div class="seo-content" style="margin-top: 3rem; text-align: left; border-top: 1px solid rgba(102, 126, 234, 0.2); padding-top: 2rem;">
+        <h2>What are Calories?</h2>
+        <p style="margin-top: 0.5rem; line-height: 1.6;">A calorie is a unit of energy. In nutrition, calories refer to the energy people get from the food and drink they consume, and the energy they use in physical activity.</p>
+        
+        <h3 style="margin-top: 1.5rem;">How is Daily Caloric Need Calculated?</h3>
+        <p style="margin-top: 0.5rem; line-height: 1.6;">Your daily calorie needs are determined by your Basal Metabolic Rate (BMR) multiplied by an activity factor. A common formula used is the Mifflin-St Jeor Equation:</p>
+        <div style="background: rgba(102, 126, 234, 0.1); padding: 1rem; border-radius: 10px; text-align: center; font-family: monospace; font-size: 1.2rem; margin: 1rem 0; color: #667eea;">
+            Men: (10 × weight in kg) + (6.25 × height in cm) - (5 × age in years) + 5<br>
+            Women: (10 × weight in kg) + (6.25 × height in cm) - (5 × age in years) - 161
+        </div>
+        <p style="line-height: 1.6;">This BMR is then multiplied by an activity multiplier (from 1.2 for sedentary to 1.9 for extremely active) to find your Total Daily Energy Expenditure (TDEE).</p>
+
+        <h3 style="margin-top: 1.5rem;">Frequently Asked Questions</h3>
+        <div class="faq-item" style="margin-top: 1rem;">
+            <strong>Q: How many calories should I cut to lose weight?</strong>
+            <p style="margin-top: 0.3rem; margin-bottom: 1rem; line-height: 1.6;">A: A general rule of thumb is that a deficit of 500 calories per day will lead to about 1 pound of weight loss per week. However, this varies based on your metabolism and activity level.</p>
+        </div>
+        <div class="faq-item">
+            <strong>Q: Are all calories the same?</strong>
+            <p style="margin-top: 0.3rem; line-height: 1.6;">A: While all calories provide the same amount of energy, the source of the calories (protein, carbs, or fats) significantly impacts your metabolism, hormone levels, and satiety.</p>
         </div>
     </div>
 </div>

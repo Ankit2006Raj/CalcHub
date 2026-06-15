@@ -24,6 +24,10 @@ class CommandPalette {
             { name: 'Discount Calculator', url: '/discount', icon: '🏷️', keywords: ['discount', 'sale', 'price', 'savings', 'offer'] },
             { name: 'Percentage Calculator', url: '/percentage', icon: '📊', keywords: ['percentage', 'marks', 'score', 'result'] },
             { name: 'Currency Converter', url: '/currency-converter', icon: '💱', keywords: ['currency', 'exchange', 'convert', 'money', 'forex'] },
+            { name: 'Credit Card EMI', url: '/credit-card-emi', icon: '💳', keywords: ['credit', 'card', 'emi', 'interest', 'fee'] },
+            { name: 'FD Calculator', url: '/fd-calculator', icon: '🏦', keywords: ['fixed', 'deposit', 'fd', 'interest', 'maturity'] },
+            { name: 'Electricity Bill', url: '/electricity-bill', icon: '⚡', keywords: ['electricity', 'bill', 'power', 'energy', 'units'] },
+            { name: 'GST Calculator', url: '/gst-calculator', icon: '🧾', keywords: ['gst', 'tax', 'rate', 'inclusive', 'exclusive'] },
 
             // Education
             { name: 'GPA Calculator', url: '/gpa', icon: '📚', keywords: ['gpa', 'grade', 'academic', 'school', 'college'] },

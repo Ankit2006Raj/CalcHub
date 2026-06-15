@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}GST Calculator - CalcHub{% endblock %}
+
+{% block meta %}
+<meta name="description" content="Calculate GST instantly. Easily add or remove GST from your prices with breakdown of CGST and SGST.">
+<meta property="og:title" content="GST Calculator - CalcHub">
+{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>GST Calculator</h1>
+    <div class="calc-container">
+        <div class="input-group">
+            <label>Amount (₹)</label>
+            <input type="number" id="gst-amount" placeholder="Enter amount">
+        </div>
+        <div class="input-group">
+            <label>GST Rate (%)</label>
+            <select id="gst-rate" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1;">
+                <option value="5">5%</option>
+                <option value="12">12%</option>
+                <option value="18" selected>18%</option>
+                <option value="28">28%</option>
+            </select>
+        </div>
+        <div class="input-group">
+            <label>Calculation Mode</label>
+            <select id="gst-mode" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1;">
+                <option value="add" selected>Add GST (Exclusive to Inclusive)</option>
+                <option value="remove">Remove GST (Inclusive to Exclusive)</option>
+            </select>
+        </div>
+        <button class="btn-primary" onclick="calculateGST()">Calculate GST</button>
+
+        <div id="result" class="result-box" style="display:none;">
+            <h2>GST Breakdown</h2>
+            <div class="loan-results">
+                <div class="loan-item">
+                    <h3>Net Amount</h3>
+                    <p id="gst-net"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Total GST</h3>
+                    <p id="gst-total-tax"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Gross Amount</h3>
+                    <p id="gst-gross" class="highlight"></p>
+                </div>
+            </div>
+            
+            <div style="margin-top: 1.5rem; text-align: center; color: #64748b; font-size: 0.9rem;">
+                <p>CGST: <span id="gst-cgst"></span> | SGST: <span id="gst-sgst"></span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function calculateGST() {
+    const amount = parseFloat(document.getElementById('gst-amount').value);
+    const rate = parseFloat(document.getElementById('gst-rate').value);
+    const mode = document.getElementById('gst-mode').value;
+
+    if (!amount || isNaN(amount)) {
+        alert("Please enter a valid amount");
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/gst-calculator', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                amount: amount,
+                gst_rate: rate,
+                mode: mode
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        document.getElementById('result').style.display = 'block';
+        document.getElementById('gst-net').textContent = "₹" + data.net_amount.toFixed(2);
+        document.getElementById('gst-total-tax').textContent = "₹" + data.gst_amount.toFixed(2);
+        document.getElementById('gst-gross').textContent = "₹" + data.gross_amount.toFixed(2);
+        
+        document.getElementById('gst-cgst').textContent = "₹" + data.cgst.toFixed(2);
+        document.getElementById('gst-sgst').textContent = "₹" + data.sgst.toFixed(2);
+        
+    } catch (err) {
+        console.error(err);
+        alert('An error occurred during calculation');
+    }
+}
+</script>
+{% endblock %}

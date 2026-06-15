@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Fixed Deposit (FD) Calculator - CalcHub{% endblock %}
+
+{% block meta %}
+<meta name="description" content="Calculate your Fixed Deposit (FD) returns instantly. Find out the maturity amount and total interest earned.">
+<meta property="og:title" content="Fixed Deposit (FD) Calculator - CalcHub">
+{% endblock %}
+
+{% block content %}
+<div class="calculator-page">
+    <h1>Fixed Deposit (FD) Calculator</h1>
+    <div class="calc-container">
+        <div class="input-group">
+            <label>Principal Amount (₹)</label>
+            <input type="number" id="fd-principal" placeholder="Enter investment amount">
+        </div>
+        <div class="input-group">
+            <label>Annual Interest Rate (%)</label>
+            <input type="number" step="0.1" id="fd-rate" placeholder="e.g. 6.5">
+        </div>
+        <div class="input-group">
+            <label>Time Period (Years)</label>
+            <input type="number" step="0.1" id="fd-years" placeholder="e.g. 5">
+        </div>
+        <div class="input-group">
+            <label>Compounding Frequency</label>
+            <select id="fd-compounding" style="width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid #cbd5e1;">
+                <option value="yearly">Yearly</option>
+                <option value="half-yearly">Half-Yearly</option>
+                <option value="quarterly" selected>Quarterly</option>
+                <option value="monthly">Monthly</option>
+            </select>
+        </div>
+        <button class="btn-primary" onclick="calculateFD()">Calculate Returns</button>
+
+        <div id="result" class="result-box" style="display:none;">
+            <h2>Maturity Details</h2>
+            <div class="loan-results">
+                <div class="loan-item">
+                    <h3>Total Investment</h3>
+                    <p id="fd-investment"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Total Interest</h3>
+                    <p id="fd-interest"></p>
+                </div>
+                <div class="loan-item">
+                    <h3>Maturity Value</h3>
+                    <p id="fd-maturity" class="highlight"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+async function calculateFD() {
+    const principal = parseFloat(document.getElementById('fd-principal').value);
+    const rate = parseFloat(document.getElementById('fd-rate').value);
+    const years = parseFloat(document.getElementById('fd-years').value);
+    const compounding = document.getElementById('fd-compounding').value;
+
+    if (!principal || !rate || !years) {
+        alert("Please enter principal, rate, and time period");
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/fd-calculator', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                principal: principal,
+                rate: rate,
+                years: years,
+                compounding_frequency: compounding
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        document.getElementById('result').style.display = 'block';
+        document.getElementById('fd-investment').textContent = "₹" + data.principal.toFixed(2);
+        document.getElementById('fd-interest').textContent = "₹" + data.total_interest.toFixed(2);
+        document.getElementById('fd-maturity').textContent = "₹" + data.maturity_amount.toFixed(2);
+        
+    } catch (err) {
+        console.error(err);
+        alert('An error occurred during calculation');
+    }
+}
+</script>
+{% endblock %}
